@@ -13,7 +13,7 @@ const Style = styled.div`
   left: 0;
   background-color: #fff6f6;
   z-index: 1000;
-  transition: width 0.5s;
+  transition: width 0.4s;
 `;
 
 const FlexMenu = () => {
@@ -28,7 +28,7 @@ const FlexMenu = () => {
       }}>
         <ArrowForwardIosRoundedIcon sx={{
             transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "0.2s",
+            transition: "0.3s",
         }} />
       </IconButton>
     </Style>
