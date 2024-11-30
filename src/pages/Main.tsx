@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import MyCalendar from "../components/MyCalendar";
 import FlexMenu from "../components/FlexMenu";
+import LoginModal from "../components/LoginModal";
+import RegisterModal from "../components/RegisterModal";
 
 const Style = styled.div`
     display: flex;
@@ -14,6 +16,8 @@ const Main = () => {
         <Style>
             <FlexMenu />
             <MyCalendar />
+            <LoginModal />
+            <RegisterModal />
         </Style>
     );
 }
