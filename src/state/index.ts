@@ -33,3 +33,9 @@ export const eventsAtom = atom([
     color: color.orange,
   },
 ]);
+
+// 로그인 모달 상태
+export const isLoginModalOpenAtom = atom(false);
+
+// 회원가입 모달 상태
+export const isRegisterModalOpenAtom = atom(false);
