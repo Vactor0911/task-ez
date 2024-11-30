@@ -1,12 +1,12 @@
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded"; // 화살표 아이콘
-import { useState } from "react";
-import { IconButton, Button } from "@mui/material"; // 아이콘 버튼, 버튼 컴포넌트
-import SearchIcon from "@mui/icons-material/Search"; // 검색 아이콘
-import DateRangeIcon from '@mui/icons-material/DateRange'; // 달력 아이콘
-import NotificationsIcon from '@mui/icons-material/Notifications'; // 알림 아이콘
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import { IconButton, Button, Typography, Box } from "@mui/material";
+import { useAtom } from "jotai";
+import { isLoginModalOpenAtom } from "../state";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SearchIcon from "@mui/icons-material/Search";
 
-// 스타일 정의
 const Style = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,137 +20,185 @@ const Style = styled.div`
   transition: width 0.4s;
   overflow: hidden;
 
-  .main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
-    transition: margin-left 0.4s;
+  &.expanded {
+    width: 300px;
   }
 
-  /* 상단 헤더 영역 스타일 */
+  &.collapsed {
+    width: 60px;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 20px;
+    padding: 10px 20px;
 
     .logo {
-      font-size: 24px;
+      display: block;
+      font-size: 18px;
       font-weight: bold;
       color: #333;
+    }
 
-      span {
-        margin-left: 8px;
-      }
+    .collapsed .logo {
+      display: none;
     }
 
     .auth-buttons {
       button {
-        margin-left: 10px;
-        font-size: 14px;
+        font-size: 12px;
         color: #555;
-        background-color: #f2f2f2;
-        border-radius: 20px;
-        padding: 5px 15px;
+        background-color: #E5E5E5;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-weight: bold;
       }
     }
   }
 
-  /* 검색바 영역 스타일 */
-  .search-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .menu-items {
     width: 100%;
-    padding: 10px 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-    .search-container {
+    .menu-item {
       display: flex;
       align-items: center;
-      width: 60%;
-      border: 1px solid #ddd;
-      border-radius: 25px;
-      padding: 10px 15px;
-      background-color: #fff;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
 
-      .search-icon {
-        margin-right: 10px;
-        color: #888;
-      }
-
-      .search-input {
-        flex: 1;
-        border: none;
-        outline: none;
-        font-size: 16px;
-        color: #999;
-        background: none;
+      .menu-icon {
+        margin-right: 12px;
+        font-size: 20px;
       }
     }
   }
 
-  /* 화살표 버튼 위치 설정 */
   .arrow-container {
     position: absolute;
-    top: 50%; /* 세로 중앙 */
-    left: ${(props: { isExpanded: boolean }) =>
-      props.isExpanded ? "95%" : "50%"}; /* 펼침 상태에 따라 위치 조정 */
+    top: 50%;
+    left: 95%;
     transform: translate(-50%, -50%);
     transition: left 0.4s;
+  }
+
+  &.collapsed .arrow-container {
+    left: 50%;
+  }
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    width: 100%;
+
+    .search-icon {
+      color: #888;
+      margin-right: 8px;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #555;
+      background: none;
+    }
   }
 `;
 
 const FlexMenu: React.FC = () => {
-  // 사이드바 상태를 관리하는 useState
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
+
+  // 화면 로딩 상태 관리
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // 화면 렌더링 완료 후 상태 업데이트
+  useEffect(() => {
+    const handleLoad = () => setIsLoaded(true);
+
+    if (document.readyState === "complete") {
+      handleLoad();
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    return () => {
+      window.removeEventListener("load", handleLoad);
+    };
+  }, []);
+
+  // 로딩 중일 경우 FlexMenu 숨김
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
-    <Style
-      style={{
-        width: isExpanded ? "30%" : "5%", // 펼쳐진 상태에 따라 너비 조정
-      }}
-      isExpanded={isExpanded} // 상태를 props로 전달
-    >
+    <Style className={isExpanded ? "expanded" : "collapsed"}>
       {/* 헤더 섹션 */}
       <div className="header">
-        <div className="logo">
-          <span>TZ</span>
-        </div>
-        <div className="auth-buttons">
-          <Button variant="text">로그인/회원가입</Button>
-        </div>
+        {isExpanded && (
+          <Typography variant="h6" className="logo">
+            Task Ez
+          </Typography>
+        )}
+        {isExpanded && (
+          <div className="auth-buttons">
+            <Button
+              variant="text"
+              onClick={() => setIsLoginModalOpen(true)} // 로그인 모달 열기
+            >
+              로그인/회원가입
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* 검색바 섹션 - 펼쳐진 상태에서만 렌더링 */}
+      {/* 검색 바 */}
       {isExpanded && (
-        <div className="search-bar">
-          <div className="search-container">
+        <Box className="search-bar" sx={{ width: "100%", padding: "16px" }}>
+          <Box className="search-container">
             <SearchIcon className="search-icon" />
             <input
               type="text"
               className="search-input"
               placeholder="할 일 검색"
             />
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
 
-      {/* 화살표 버튼 섹션 */}
+      {/* 메뉴 아이템 */}
+      {isExpanded && (
+        <Box className="menu-items">
+          <Box className="menu-item">
+            <NotificationsIcon className="menu-icon" />
+            <Typography>알림 (0)</Typography>
+          </Box>
+        </Box>
+      )}
+
+      {/* 토글 버튼 */}
       <div className="arrow-container">
         <IconButton
           aria-label="toggle-menu"
           size="small"
-          onClick={() => {
-            setIsExpanded(!isExpanded); // 상태 토글
-          }}
+          onClick={() => setIsExpanded(!isExpanded)}
         >
           <ArrowForwardIosRoundedIcon
             sx={{
-              transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", // 펼침 상태에 따라 화살표 회전
-              transition: "0.3s", // 부드러운 애니메이션
+              transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "0.3s",
             }}
           />
         </IconButton>
