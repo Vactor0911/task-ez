@@ -129,24 +129,6 @@ const MyCalendar = () => {
     setIsModalOpened(true); // 모달 열기
   };
 
-  // 이벤트 더보기 외부 클릭시 팝업 닫기
-  const refCollapse = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        refCollapse.current &&
-        !refCollapse.current.contains(event.target as Node) &&
-        event.target !== showMoreBtnAnchor
-      ) {
-        setIsShowMoreOpened(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [refCollapse, showMoreBtnAnchor]);
-
   return (
     <>
       <StyledCalendar
