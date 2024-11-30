@@ -4,18 +4,18 @@ import moment from "moment";
 import dayjs from "dayjs";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import MyCalendarToolbar from "./MyCalendarToolbar";
-import { useCallback, useState } from "react";
-import { useAtom } from "jotai";
-import { selectedDateAtom } from "../state";
-import { color } from "../utils/theme";
-import PopupModal from "./PopupModal";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useAtom, useAtomValue } from "jotai";
+import { hiddenEventsAtom, isShowMoreOpenedAtom, selectedDateAtom, showMoreBtnAnchorAtom } from "../state";
+import { Box, Collapse, Paper, Popper } from "@mui/material";
+import MyShowMore from "./MyShowMore";
 
 const StyledCalendar = styled(Calendar)`
   width: 95%;
   height: 100vh;
 
   .rbc-day-bg:hover {
-    background-color: ${color.calendal_background};
+    background-color: #f0f0f0;
   }
 
   .rbc-row-segment {
@@ -25,130 +25,189 @@ const StyledCalendar = styled(Calendar)`
 `;
 
 const MyCalendar = () => {
+  // 시간 날짜 형식을 한국어로 설정
   moment.locale("ko-KR");
   const localizer = momentLocalizer(moment);
 
   // 선택된 날짜
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
 
-  // 이벤트 상태
-  const [events, setEvents] = useState([
+  // 더보기 버튼 클릭시 표시할 숨겨진 이벤트 목록
+  const hiddenEvents = useAtomValue(hiddenEventsAtom);
+  const [isShowMoreOpened, setIsShowMoreOpened] = useAtom(isShowMoreOpenedAtom);
+  const [isShowMoreOpenedDelayed, setIsShowMoreOpenedDelayed] = useState(false);
+  const showMoreBtnAnchor = useAtomValue(showMoreBtnAnchorAtom);
+
+  // 더보기 팝업 닫힘 여부 지연 처리
+  useEffect(() => {
+    if (isShowMoreOpened) {
+      setIsShowMoreOpenedDelayed(isShowMoreOpened);
+      return;
+    }
+
+    setTimeout(() => {
+      setIsShowMoreOpenedDelayed(isShowMoreOpened);
+    }, 300);
+  }, [isShowMoreOpened]);
+
+  // 캘린더에 표시할 테스트용 이벤트
+  const events = [
     {
       title: "작업1",
-      description: "작업1 설명",
       start: new Date(2024, 10, 17),
       end: new Date(2024, 10, 18),
       id: 0,
-      color: color.red,
+      color: "red",
+    },
+    {
+      title:
+        "엄청나게 긴 이벤트 제목을 가진 작업3. 제목을 늘리기 위해 뭘 적는게 좋을지 고민중. 아무튼 이름이 엄청 긴 이벤트의 제목임. 여기서 제목이 더 길어지면 어떻게 되는지 보기 위해 이렇게 길게 작성함.",
+      start: new Date(2024, 10, 17),
+      end: new Date(2024, 10, 18),
+      id: 2,
+      color: "blue",
+    },
+    {
+      title: "작업4",
+      start: new Date(2024, 10, 17),
+      end: new Date(2024, 10, 19),
+      id: 3,
+      color: "orange",
+    },
+    {
+      title: "작업5",
+      start: new Date(2024, 10, 17),
+      end: new Date(2024, 10, 19),
+      id: 4,
+      color: "red",
+    },
+    {
+      title: "작업6",
+      start: new Date(2024, 10, 17),
+      end: new Date(2024, 10, 18),
+      id: 5,
+      color: "red",
     },
     {
       title: "작업2",
-      description: "작업2 설명",
       start: new Date(2024, 10, 19),
       end: new Date(2024, 11, 21),
       id: 1,
-      color: color.orange,
+      color: "green",
     },
-  ]);
+  ];
 
-  // 모달 상태 및 선택된 데이터
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState(null);
+  // 캘린더 슬롯 선택 이벤트 처리
+  const handleSelectSlot = useCallback(
+    (event: any) => {
+      // 더보기 팝업이 열려있으면 이벤트 처리 중지
+      if (isShowMoreOpenedDelayed) {
+        return;
+      }
 
-  // 빈 슬롯 클릭 이벤트 (새 이벤트 추가)
-  const handleSelectSlot = useCallback((slotInfo) => {
-    setModalData({
-      type: "slot", // 새 이벤트 추가 모드
-      data: {
-        title: "", // 초기화된 제목
-        description: "", // 초기화된 설명
-        color: color.red, // 기본 색상 설정
-        start: dayjs(slotInfo.start).format("YYYY-MM-DD"), // 시작 날짜 설정
-        end: dayjs(slotInfo.end).format("YYYY-MM-DD"), // 종료 날짜 설정
-      },
-    });
-    setIsModalOpen(true); // 모달 열기
-  }, []);
+      console.log("Selected Slot! ", event);
+    },
+    [isShowMoreOpenedDelayed]
+  );
 
-  // 기존 이벤트 클릭 이벤트 (이벤트 수정)
-  const handleSelectEvent = (event) => {
-    setModalData({
-      type: "event", // 기존 이벤트 수정 모드
-      data: {
-        ...event, // 기존 이벤트 데이터
-        start: dayjs(event.start).format("YYYY-MM-DD"), // 시작 날짜
-        end: dayjs(event.end).format("YYYY-MM-DD"), // 종료 날짜
-      },
-    });
-    setIsModalOpen(true); // 모달 열기
-  };
-
-  // 모달 닫기
-  const handleCloseModal = () => {
-    setIsModalOpen(false); // 모달 닫기
-    setModalData(null); // 데이터 초기화
-  };
-
-  // 모달 저장 버튼 처리
-  const handleSaveModal = (updatedData) => {
-    if (modalData?.type === "event") {
-      // 기존 이벤트 수정
-      setEvents((prevEvents) =>
-        prevEvents.map((evt) =>
-          evt.id === modalData.data.id ? { ...evt, ...updatedData } : evt
-        )
-      );
-    } else if (modalData?.type === "slot") {
-      // 새 이벤트 추가
-      setEvents((prevEvents) => [
-        ...prevEvents,
-        {
-          ...updatedData,
-          id: prevEvents.length, // 고유 ID 생성
-          start: modalData.data.start,
-          end: modalData.data.end,
-        },
-      ]);
+  // 캘린더 이벤트 선택 이벤트 처리
+  const handleSelectEvent = (event: any, hidden: boolean = false) => {
+    // 더보기 팝업이 열려있으면 이벤트 처리 중지
+    if (isShowMoreOpenedDelayed && !hidden) {
+      return;
     }
-    handleCloseModal();
+
+    console.log("Selected Event! ", event);
   };
 
-  // 모달 삭제 버튼 처리
-  const handleDeleteModal = () => {
-    if (modalData?.type === "event") {
-      // 기존 이벤트 삭제
-      setEvents((prevEvents) =>
-        prevEvents.filter((evt) => evt.id !== modalData.data.id)
-      );
-    }
-    handleCloseModal();
-  };
+  // 이벤트 더보기 외부 클릭시 팝업 닫기
+  const refCollapse = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        refCollapse.current &&
+        !refCollapse.current.contains(event.target as Node) &&
+        event.target !== showMoreBtnAnchor
+      ) {
+        setIsShowMoreOpened(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [refCollapse, showMoreBtnAnchor]);
 
   return (
     <>
       <StyledCalendar
         localizer={localizer} // 언어 설정
-        views={["month"]} // 월간 뷰 활성화
-        events={events} // 이벤트 목록 전달
-        selectable // 빈 슬롯 선택 가능
-        date={selectedDate.toDate()} // 현재 선택된 날짜
-        components={{ toolbar: MyCalendarToolbar }} // 커스텀 툴바 사용
-        onSelectSlot={handleSelectSlot} // 빈 슬롯 클릭 이벤트
-        onSelectEvent={handleSelectEvent} // 이벤트 클릭 이벤트
-        eventPropGetter={(event) => ({
-          style: { backgroundColor: event.color },
-        })}
-        onNavigate={(date) => setSelectedDate(dayjs(date))} // 날짜 이동 이벤트
+        views={["month"]}
+        events={events} // 표시할 이벤트 목록
+        selectable
+        date={selectedDate.toDate()}
+        components={{
+          toolbar: MyCalendarToolbar,
+          showMore: MyShowMore,
+        }} // 툴바 컴포넌트
+        onSelectSlot={handleSelectSlot} // 슬롯 클릭 이벤트
+        onSelectEvent={(event) => handleSelectEvent(event)} // 이벤트 클릭 이벤트
+        eventPropGetter={(event: any) => {
+          // 이벤트 요소 스타일 설정
+          return {
+            style: {
+              backgroundColor: event.color,
+            },
+          };
+        }}
+        onNavigate={(date) => {
+          // 날짜 변경 이벤트
+          setSelectedDate(dayjs(date));
+        }}
       />
-
-      {/* 팝업 모달 */}
-      <PopupModal
-        open={isModalOpen} // 모달 열림 여부
-        onClose={handleCloseModal} // 모달 닫기 핸들러
-        onSave={handleSaveModal} // 저장 핸들러
-        onDelete={handleDeleteModal} // 삭제 핸들러
-        defaultData={modalData?.data || {}} // 기본 데이터 전달
-      />
+      <Popper
+        open={true}
+        placement="bottom-start"
+        anchorEl={showMoreBtnAnchor}
+        sx={{
+          zIndex: 10,
+        }}
+      >
+        <Collapse in={isShowMoreOpened} ref={refCollapse}>
+          <Paper
+            elevation={3}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "5px 10px",
+              gap: "5px",
+              marginTop: "10px",
+            }}
+          >
+            {hiddenEvents.map((event, index) => {
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    backgroundColor: event.color,
+                    padding: "5px",
+                    borderRadius: "5px",
+                    color: "white",
+                    cursor: "pointer",
+                    width: "200px",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                  onClick={() => handleSelectEvent(event, true)}
+                >
+                  {event.title}
+                </Box>
+              );
+            })}
+          </Paper>
+        </Collapse>
+      </Popper>
     </>
   );
 };
