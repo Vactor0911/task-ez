@@ -6,23 +6,31 @@ import {
   Button,
   Typography,
   IconButton,
+  InputAdornment,
+  OutlinedInput,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAtom } from "jotai";
 import { isLoginModalOpenAtom, isRegisterModalOpenAtom } from "../state";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const LoginModal = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
   const [, setIsRegisterModalOpen] = useAtom(isRegisterModalOpenAtom);
 
-  const [email, setEmail] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // 패스워드 보이기 여부
+
+  const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // 오류 메시지 상태
 
   // 모달 닫기 및 초기화
   const handleClose = () => {
     setIsLoginModalOpen(false);
-    setEmail("");
+    setId("");
     setPassword("");
     setErrorMessage(""); // 오류 메시지 초기화
   };
@@ -35,13 +43,13 @@ const LoginModal = () => {
 
   // 로그인 처리
   const handleLogin = () => {
-    if (!email || !password) {
-      setErrorMessage("이메일과 패스워드를 입력해주세요.");
+    if (!id || !password) {
+      setErrorMessage("아이디와 패스워드를 입력해주세요.");
       return;
     }
 
     // 서버 요청 예제 (실제 로직 추가 가능)
-    const isValid = email === "test@example.com" && password === "password";
+    const isValid = id === "test@example.com" && password === "password";
     if (!isValid) {
       setErrorMessage("로그인 정보를 확인해주세요.");
       return;
@@ -53,7 +61,6 @@ const LoginModal = () => {
   };
 
   return (
-    
     <Dialog
       open={isLoginModalOpen}
       onClose={handleClose}
@@ -79,26 +86,48 @@ const LoginModal = () => {
           </IconButton>
         </Box>
 
-        {/* 이메일 입력 */}
+        {/* 아이디 입력 */}
         <TextField
-          label="이메일 입력"
+          label="아이디 입력"
           variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={id}
+          onChange={(e) => setId(e.target.value)}
           fullWidth
           margin="dense"
         />
 
         {/* 패스워드 입력 */}
-        <TextField
-          label="패스워드 입력"
-          type="password"
-          variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          margin="dense"
-        />
+        <FormControl sx={{ marginTop: "20px" }} fullWidth variant="outlined">
+          <InputLabel htmlFor="outlined-adornment-password">
+            패스워드 입력
+          </InputLabel>
+          <OutlinedInput
+            fullWidth
+            id="outlined-adornment-password"
+            margin="dense"
+            label="패스워드 입력"
+            type={isPasswordVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => {
+                    setIsPasswordVisible(!isPasswordVisible);
+                  }}
+                >
+                  {isPasswordVisible ? (
+                    <VisibilityIcon sx={{ color: "black" }} />
+                  ) : (
+                    <VisibilityOffIcon sx={{ color: "black" }} />
+                  )}
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+
         <Box
           sx={{
             display: "flex",
