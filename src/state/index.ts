@@ -3,6 +3,12 @@ import { atom } from "jotai";
 import { TaskProps } from "../components/TaskModal";
 import { color } from "../utils/theme";
 
+//서버 정보
+export const serverInfoAtom = atom({
+  PORT:3005,
+  HOST:"http://localhost"
+});
+
 export const selectedDateAtom = atom(dayjs());
 
 // 더보기 팝업 관련 상태
@@ -39,3 +45,13 @@ export const isLoginModalOpenAtom = atom(false);
 
 // 회원가입 모달 상태
 export const isRegisterModalOpenAtom = atom(false);
+
+
+// 로그인 상태 저장 - LocalStorage에서 상태를 불러옵니다.
+const savedLoginState = JSON.parse(localStorage.getItem("loginState") || "{}");
+
+export const loginStateAtom = atom({
+  isLoggedIn: savedLoginState.isLoggedIn || false, // 로그인 상태
+  id: savedLoginState.id || "", // 로그인된 사용자의 아이디
+});
+

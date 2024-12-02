@@ -6,23 +6,39 @@ import {
   Button,
   Typography,
   IconButton,
+  InputAdornment,
+  OutlinedInput,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
 import { isLoginModalOpenAtom, isRegisterModalOpenAtom } from "../state";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { serverInfoAtom, loginStateAtom } from "../state";  // serverInfoAtom, loginStateAtom 불러오기
+import axios from "axios";
 
 const LoginModal = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
   const [, setIsRegisterModalOpen] = useAtom(isRegisterModalOpenAtom);
 
-  const [email, setEmail] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // 패스워드 보이기 여부
+
+  const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // 오류 메시지 상태
+
+  const setLoginState = useSetAtom(loginStateAtom); // useSetAtom 불러오기
+  const [, setIsLoading] = useState(false); // 로그인 로딩 상태 추가
+  const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
+  const HOST = serverInfo.HOST; // HOST 불러오기
+  const PORT = serverInfo.PORT; // PORT 불러오기
 
   // 모달 닫기 및 초기화
   const handleClose = () => {
     setIsLoginModalOpen(false);
-    setEmail("");
+    setId("");
     setPassword("");
     setErrorMessage(""); // 오류 메시지 초기화
   };
@@ -33,27 +49,63 @@ const LoginModal = () => {
     setIsRegisterModalOpen(true);
   };
 
-  // 로그인 처리
-  const handleLogin = () => {
-    if (!email || !password) {
-      setErrorMessage("이메일과 패스워드를 입력해주세요.");
+  //일반 로그인 기능 시작
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 입력값 검증
+    if (!id || !password) {
+      alert("이메일과 비밀번호를 입력해 주세요.");
       return;
     }
 
-    // 서버 요청 예제 (실제 로직 추가 가능)
-    const isValid = email === "test@example.com" && password === "password";
-    if (!isValid) {
-      setErrorMessage("로그인 정보를 확인해주세요.");
-      return;
-    }
+    setIsLoading(true); // 로딩 상태 활성화
 
-    console.log("로그인 성공!");
-    setErrorMessage(""); // 오류 메시지 초기화
-    handleClose(); // 모달 닫기
-  };
+    // 서버에 로그인 요청
+    axios
+      .post(`${HOST}:${PORT}/api/login`, {
+        id: id,
+        password: password,
+      })
+      .then((response) => {
+        const { nickname } = response.data;
+
+        // 로그인 성공 메시지
+        alert(`[ ${nickname} ]님 로그인에 성공했습니다!`);
+
+        // 로그인 상태 업데이트
+        const loginState = {
+          isLoggedIn: true,
+          id: id,
+        };
+
+        // Jotai 상태 업데이트
+        setLoginState(loginState);
+
+        // LocalStorage에 저장
+        localStorage.setItem("loginState", JSON.stringify(loginState));
+
+        // 성공 후 로그인 모달 닫기
+        handleClose(); // 모달 닫기
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.error("서버 오류:", error.response.data.message);
+          alert(error.response.data.message || "로그인 실패");
+        } else {
+          console.error("요청 오류:", error.message);
+          alert("예기치 않은 오류가 발생했습니다. 나중에 다시 시도해 주세요.");
+        }
+
+        // 로그인 실패 시 비밀번호 초기화
+        setPassword("");
+      })
+      .finally(() => {
+        setIsLoading(false); // 로딩 상태 비활성화
+      });
+  }; //일반 로그인 기능 끝
 
   return (
-    
     <Dialog
       open={isLoginModalOpen}
       onClose={handleClose}
@@ -79,26 +131,48 @@ const LoginModal = () => {
           </IconButton>
         </Box>
 
-        {/* 이메일 입력 */}
+        {/* 아이디 입력 */}
         <TextField
-          label="이메일 입력"
+          label="아이디 입력"
           variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={id}
+          onChange={(e) => setId(e.target.value)}
           fullWidth
           margin="dense"
         />
 
         {/* 패스워드 입력 */}
-        <TextField
-          label="패스워드 입력"
-          type="password"
-          variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          margin="dense"
-        />
+        <FormControl sx={{ marginTop: "20px" }} fullWidth variant="outlined">
+          <InputLabel htmlFor="outlined-adornment-password">
+            패스워드 입력
+          </InputLabel>
+          <OutlinedInput
+            fullWidth
+            id="outlined-adornment-password"
+            margin="dense"
+            label="패스워드 입력"
+            type={isPasswordVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => {
+                    setIsPasswordVisible(!isPasswordVisible);
+                  }}
+                >
+                  {isPasswordVisible ? (
+                    <VisibilityIcon sx={{ color: "black" }} />
+                  ) : (
+                    <VisibilityOffIcon sx={{ color: "black" }} />
+                  )}
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+
         <Box
           sx={{
             display: "flex",
