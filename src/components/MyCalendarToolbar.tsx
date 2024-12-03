@@ -2,7 +2,6 @@ import styled from "@emotion/styled";
 import { Button, Collapse, IconButton, Paper, Popper } from "@mui/material";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -11,6 +10,7 @@ import { selectedDateAtom } from "../state";
 
 // 아이콘
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import { MAX_DATE, MIN_DATE } from "../utils";
 
 const Style = styled.div`
   .rbc-toolbar {
@@ -41,10 +41,6 @@ const MyCalendarToolbar = () => {
   const [isDataCalendarOpen, setIsDataCalendarOpen] = useState(false); // 달력 선택기 열림 여부
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom); // 선택된 날짜
   const anchorElem = useRef<HTMLButtonElement>(null); // 달력 선택기 버튼 요소
-
-  // 선택 가능한 날짜 범위
-  const MIN_DATE = dayjs().add(-1, "year").month(0); // 1년 전 1월
-  const MAX_DATE = dayjs().add(1, "year").month(11); // 1년 후 12월
 
   // 달력 선택기 외부 클릭 시 달력 선택기 닫기
   const refCollapse = useRef<HTMLDivElement>(null);

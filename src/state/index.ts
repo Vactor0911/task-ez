@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import { atom } from "jotai";
-import { TaskProps } from "../components/TaskModal";
 import { color } from "../utils/theme";
 
 //서버 정보
@@ -18,27 +17,67 @@ export const showMoreBtnAnchorAtom = atom<HTMLButtonElement | null>(null);
 
 // 작업 모달 관련 상태
 export const isModalOpenedAtom = atom(false); // 모달 열림 여부
-export const taskDataAtom = atom(null as TaskProps | null); // 작업 데이터
+export const taskModalDataAtom = atom(null as TaskProps | null); // 작업 데이터
 
-// 작업 목록 관련 상태
+// 작업 객체 타입
+export interface TaskProps {
+  id: number;
+  title: string;
+  description: string;
+  start: Date;
+  end: Date;
+  color: string;
+}
 export const eventsAtom = atom([
   {
+    id: 0,
     title: "작업1",
     description: "작업1 설명",
-    start: new Date(2024, 10, 17),
-    end: new Date(2024, 10, 18),
-    id: 0,
+    start: new Date(2024, 11, 17),
+    end: new Date(2024, 11, 18),
     color: color.red,
   },
   {
+    id: 1,
     title: "작업2",
     description: "작업2 설명",
     start: new Date(2024, 10, 19),
     end: new Date(2024, 11, 21),
-    id: 1,
     color: color.orange,
   },
-]);
+  {
+    id: 2,
+    title: "작업3",
+    description: "작업1 설명",
+    start: new Date(2024, 11, 17),
+    end: new Date(2024, 11, 18),
+    color: color.red,
+  },
+  {
+    id: 3,
+    title: "작업4",
+    description: "작업1 설명",
+    start: new Date(2024, 11, 17),
+    end: new Date(2024, 11, 18),
+    color: color.red,
+  },
+  {
+    id: 4,
+    title: "작업5",
+    description: "작업1 설명",
+    start: new Date(2024, 11, 17),
+    end: new Date(2024, 11, 18),
+    color: color.red,
+  },
+  {
+    id: 5,
+    title: "작업6",
+    description: "작업1 설명",
+    start: new Date(2024, 11, 17),
+    end: new Date(2024, 11, 18),
+    color: color.red,
+  },
+] as TaskProps[]);
 
 // 로그인 모달 상태
 export const isLoginModalOpenAtom = atom(false);
