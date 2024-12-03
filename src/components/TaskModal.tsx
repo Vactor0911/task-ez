@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Box,
   Button,
@@ -11,33 +11,42 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { color } from "../utils/theme";
 import dayjs from "dayjs";
 import { useAtom, useAtomValue } from "jotai";
-import { eventsAtom, isModalOpenedAtom, taskDataAtom } from "../state";
+import { eventsAtom, isModalOpenedAtom, taskModalDataAtom } from "../state";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { MAX_DATE, MIN_DATE } from "../utils";
 
 const TaskModal = () => {
   const [events, setEvents] = useAtom(eventsAtom); // 이벤트 목록
-  const taskData = useAtomValue(taskDataAtom); // 작업 데이터
+  const taskModalData = useAtomValue(taskModalDataAtom); // 작업 데이터
   const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 모달 열림 여부
 
   const [title, setTitle] = useState(""); // 제목
   const [currentColor, setCurrentColor] = useState(""); // 색상
   const [description, setDescription] = useState(""); // 설명
-  const [startDate, setStartDate] = useState(null as dayjs.Dayjs | null); // 시작 날짜
-  const [endDate, setEndDate] = useState(null as dayjs.Dayjs | null); // 종료 날짜
+  const [startDate, setStartDate] = useState(dayjs()); // 시작 날짜
+  const [endDate, setEndDate] = useState(dayjs()); // 종료 날짜
 
-  // 삭제 버튼 클릭
-  const handleDeleteButtonClicked = useCallback(() => {}, []);
+  // 작업 모달 데이터가 변경되면 상태 업데이트
+  useEffect(() => {
+    if (taskModalData) {
+      setTitle(taskModalData.title);
+      setCurrentColor(taskModalData.color);
+      setDescription(taskModalData.description);
+      setStartDate(dayjs(taskModalData.start));
+      setEndDate(dayjs(taskModalData.end).add(-1, "day"));
+    }
+  }, [taskModalData]);
 
   // 저장 버튼 클릭
   const handleSaveButtonClicked = useCallback(() => {
-    if (!taskData || !title || !startDate || !endDate) {
+    if (!taskModalData || !title || !startDate || !endDate) {
       return;
     } // 데이터가 없으면 중지
 
     setEvents(
       events.map((event) =>
-        event.id === taskData.id
+        event.id === taskModalData.id
           ? {
               ...event,
               title: title,
@@ -48,8 +57,19 @@ const TaskModal = () => {
             }
           : event
       )
-    )
+    );
+    setIsModalOpened(false);
   }, [title, currentColor, description, startDate, endDate]);
+
+  // 삭제 버튼 클릭
+  const handleDeleteButtonClicked = useCallback(() => {
+    if (!taskModalData) {
+      return;
+    } // 데이터가 없으면 중지
+
+    setEvents(events.filter((event) => event.id !== taskModalData.id));
+    setIsModalOpened(false);
+  }, [taskModalData]);
 
   return (
     <Dialog
@@ -76,13 +96,25 @@ const TaskModal = () => {
               label="시작 날짜"
               value={startDate}
               format="YYYY-MM-DD"
-              onChange={(newValue) => setStartDate(newValue)}
+              onChange={(newValue) => {
+                const newStartDate = newValue || dayjs();
+                setStartDate(newStartDate)
+
+                // 종료일 이후 선택시 종료일 날짜 변경
+                if (endDate.isBefore(newStartDate)) {
+                  setEndDate(newStartDate);
+                }
+              }}
+              minDate={MIN_DATE}
+              maxDate={MAX_DATE}
             />
             <DatePicker
               label="종료 날짜"
               value={endDate}
               format="YYYY-MM-DD"
-              onChange={(newValue) => setEndDate(newValue)}
+              onChange={(newValue) => setEndDate(newValue || dayjs())}
+              minDate={MIN_DATE.isBefore(startDate) ? startDate : MIN_DATE}
+              maxDate={MAX_DATE}
             />
           </LocalizationProvider>
         </Box>
