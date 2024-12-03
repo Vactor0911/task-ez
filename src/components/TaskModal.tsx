@@ -15,15 +15,6 @@ import { eventsAtom, isModalOpenedAtom, taskDataAtom } from "../state";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-export interface TaskProps {
-  id: number;
-  title: string;
-  color: string;
-  description: string;
-  startDate: dayjs.Dayjs;
-  endDate: dayjs.Dayjs;
-}
-
 const TaskModal = () => {
   const [events, setEvents] = useAtom(eventsAtom); // 이벤트 목록
   const taskData = useAtomValue(taskDataAtom); // 작업 데이터
