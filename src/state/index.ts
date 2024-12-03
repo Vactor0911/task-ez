@@ -17,7 +17,7 @@ export const showMoreBtnAnchorAtom = atom<HTMLButtonElement | null>(null);
 
 // 작업 모달 관련 상태
 export const isModalOpenedAtom = atom(false); // 모달 열림 여부
-export const taskDataAtom = atom(null as TaskProps | null); // 작업 데이터
+export const taskModalDataAtom = atom(null as TaskProps | null); // 작업 데이터
 
 // 작업 객체 타입
 export interface TaskProps {

@@ -12,11 +12,10 @@ import {
   isShowMoreOpenedAtom,
   selectedDateAtom,
   showMoreBtnAnchorAtom,
-  taskDataAtom,
+  taskModalDataAtom,
 } from "../state";
 import { color } from "../utils/theme";
 import TaskModal from "./TaskModal";
-import { Box, Collapse, Paper, Popper } from "@mui/material";
 import MyShowMore from "./MyShowMore";
 import { localizer } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
@@ -87,7 +86,7 @@ const MyCalendar = () => {
 
   // 모달 상태 및 선택된 데이터
   const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
-  const [taskData, setTaskData] = useAtom(taskDataAtom); // 작업 데이터
+  const [taskModalData, setTaskModalData] = useAtom(taskModalDataAtom); // 작업 데이터
   const [taskModalMode, setTaskModalMode] = useState<TaskModalMode>(
     TaskModalMode.NONE
   ); // 모달 모드
@@ -101,7 +100,7 @@ const MyCalendar = () => {
         return;
       }
 
-      setTaskData({
+      setTaskModalData({
         id: events.length, // 고유 ID 생성
         title: "", // 초기화된 제목
         description: "", // 초기화된 설명
@@ -122,12 +121,13 @@ const MyCalendar = () => {
     }
 
     setTaskModalMode(TaskModalMode.EVENT); // 이벤트 모드로 설정
-    setTaskData({
+    setTaskModalData({
       ...event, // 기존 이벤트 데이터
-      startDate: dayjs(event.start), // 시작 날짜
-      endDate: dayjs(event.end), // 종료 날짜
+      start: dayjs(event.start), // 시작 날짜
+      end: dayjs(event.end), // 종료 날짜
     });
     setIsModalOpened(true); // 모달 열기
+    console.log(event);
   }, [isShowMoreOpenedDelayed]);
 
   return (
