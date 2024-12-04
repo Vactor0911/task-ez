@@ -16,7 +16,7 @@ import { useAtom, useSetAtom, useAtomValue } from "jotai";
 import { isLoginModalOpenAtom, isRegisterModalOpenAtom } from "../state";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { serverInfoAtom, loginStateAtom } from "../state";  // serverInfoAtom, loginStateAtom 불러오기
+import { serverInfoAtom, TaskEzLoginStateAtom } from "../state";  // serverInfoAtom, TaskEzLoginStateAtom 불러오기
 import axios from "axios";
 
 const LoginModal = () => {
@@ -29,7 +29,7 @@ const LoginModal = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // 오류 메시지 상태
 
-  const setLoginState = useSetAtom(loginStateAtom); // useSetAtom 불러오기
+  const setLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
   const [, setIsLoading] = useState(false); // 로그인 로딩 상태 추가
   const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
   const HOST = serverInfo.HOST; // HOST 불러오기

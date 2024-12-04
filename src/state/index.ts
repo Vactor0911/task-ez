@@ -89,7 +89,7 @@ export const isRegisterModalOpenAtom = atom(false);
 // 로그인 상태 저장 - LocalStorage에서 상태를 불러옵니다.
 const savedLoginState = JSON.parse(localStorage.getItem("loginState") || "{}");
 
-export const loginStateAtom = atom({
+export const TaskEzLoginStateAtom = atom({
   isLoggedIn: savedLoginState.isLoggedIn || false, // 로그인 상태
   id: savedLoginState.id || "", // 로그인된 사용자의 아이디
 });
