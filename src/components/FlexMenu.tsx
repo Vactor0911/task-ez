@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import { IconButton, Button, Typography, Box } from "@mui/material";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { isLoginModalOpenAtom, loginStateAtom, serverInfoAtom } from "../state";
+import { isLoginModalOpenAtom, TaskEzLoginStateAtom, serverInfoAtom } from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -123,8 +123,8 @@ const Style = styled.div`
 const FlexMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
-  const { isLoggedIn, id } = useAtomValue(loginStateAtom); // 로그인 상태 읽기
-  const setLoginState = useSetAtom(loginStateAtom); // useSetAtom 불러오기
+  const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
+  const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
 
   const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
   const HOST = serverInfo.HOST; // HOST 불러오기
@@ -175,7 +175,7 @@ const FlexMenu: React.FC = () => {
           localStorage.removeItem("loginState");
   
           // Jotai 상태 초기화
-          setLoginState({
+          setTaskEzLoginState({
             isLoggedIn: false,
             id: "",
           });
