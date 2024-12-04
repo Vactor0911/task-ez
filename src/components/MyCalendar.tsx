@@ -21,7 +21,7 @@ import { localizer } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
 
 const StyledCalendar = styled(Calendar)`
-  width: 95%;
+  width: calc(100% - 60px);
   height: 100vh;
 
   .rbc-day-bg:hover {
