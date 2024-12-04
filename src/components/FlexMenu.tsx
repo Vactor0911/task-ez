@@ -172,7 +172,7 @@ const FlexMenu: React.FC = () => {
           console.log("로그아웃 응답:", response.data);
   
           // LocalStorage에서 로그인 상태 제거
-          localStorage.removeItem("loginState");
+          localStorage.removeItem("TaskEzloginState");
   
           // Jotai 상태 초기화
           setTaskEzLoginState({

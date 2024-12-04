@@ -74,16 +74,16 @@ const LoginModal = () => {
         alert(`[ ${nickname} ]님 로그인에 성공했습니다!`);
 
         // 로그인 상태 업데이트
-        const loginState = {
+        const TaskEzloginState = {
           isLoggedIn: true,
           id: id,
         };
 
         // Jotai 상태 업데이트
-        setLoginState(loginState);
+        setLoginState(TaskEzloginState);
 
         // LocalStorage에 저장
-        localStorage.setItem("loginState", JSON.stringify(loginState));
+        localStorage.setItem("TaskEzloginState", JSON.stringify(TaskEzloginState));
 
         // 성공 후 로그인 모달 닫기
         handleClose(); // 모달 닫기
