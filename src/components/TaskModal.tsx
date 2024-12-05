@@ -52,88 +52,80 @@ const TaskModal = () => {
     }
   }, [taskModalData]);
 
+
   // 저장 버튼 클릭 시작
   const handleSaveButtonClicked = useCallback(() => {
-    if (!taskModalData || !title || !startDate || !endDate) {
-      // 데이터가 없으면 중지
+    if (!title || !startDate || !endDate) {
+      // 필수 데이터가 없으면 중지
+      alert("필수 입력값이 누락되었습니다.");
       return;
     }
-
-    if (taskModalData.id === -1) {
-      // 새 작업 추가
-      setEvents([
-        ...events,
-        {
-          id: events.length,
-          title: title,
-          color: currentColor,
-          description: description,
-          start: startDate.toDate(),
-          end: endDate.add(1, "day").toDate(),
-        },
-      ]);
-    } else {
-      // 기존 작업 편집
-      setEvents(
-        events.map((event) =>
-          event.id === taskModalData.id
-            ? {
-                ...event,
-                title: title,
-                color: currentColor,
-                description: description,
-                start: startDate.toDate(),
-                end: endDate.add(1, "day").toDate(),
-              }
-            : event
-        )
-      );
-    }
-
-    // TODO: 백엔드 통신 부분 작업 오브젝트 형식 일치화 필요
-      //  axios
-      //    .post(`${HOST}:${PORT}/api/saveTask`, taskData)
-      //    .then((response) => {
-      //      if (response.data.success) {
-      //        console.log("작업 저장 성공:", response.data);
-      //        alert("작업이 성공적으로 저장되었습니다.");
     
-      //        // 새로 저장된 작업의 ID를 프론트엔드 상태에 반영
-      //        if (taskModalData.id === -1) {
-      //          setEvents((prevEvents) => [
-      //            ...prevEvents,
-      //            {
-      //              ...taskData,
-      //              id: response.data.task_id, // 백엔드에서 반환된 고유 ID
-      //              start: new Date(taskData.start), // 문자열을 Date 객체로 변환
-      //              end: new Date(taskData.end), // 문자열을 Date 객체로 변환
-      //            },
-      //          ]);
-      //        }
-      //      } else {
-      //        console.error("작업 저장 실패:", response.data.message);
-      //        alert("작업 저장에 실패했습니다: " + response.data.message);
-      //      }
-      //    })
-      //    .catch((error) => {
-      //      console.error("작업 저장 중 오류 발생:", error);
-      //      alert("작업 저장 중 오류가 발생했습니다. 다시 시도해주세요.");
-      //    });
+    // 백엔드 API로 보낼 작업 데이터 구성
+    const taskData = {
+      id: taskModalData?.id ?? null, // 고유 ID (새 작업의 경우 null로 전송)
+      user_id: 2, // 사용자 ID (임시값)
+      title,
+      description: description || "",
+      start: startDate.toISOString(),
+      end: endDate.add(1, "day").toISOString(),
+      color: currentColor || "#3174ad",
+    };
 
-    setIsModalOpened(false);
-  }, [events, title, currentColor, description, startDate, endDate]); // TODO: taskData 값 형식 변경 후 디펜던시 추가 필요
+    axios
+      .post(`${HOST}:${PORT}/api/saveTask`, taskData)
+      .then((response) => {
+        if (response.data.success) {
+          console.log("작업 저장 성공:", response.data);
 
-  // TODO: taskData 값 형식을 TaskProps 인터페이스와 일치화 필요
-  //    // 백엔드 API 호출
-  //    const taskData = {
-  //      id: taskModalData.id || null, // 고유 ID (새 작업인 경우 null로 전송)
-  //      user_id: 2, // 임시 사용자 ID
-  //      title,
-  //      description,
-  //      start: startDate.toISOString(),
-  //      end: endDate.add(1, "day").toISOString(),
-  //      color: currentColor,
-  //    };
+
+          // TODO 프론트에서 화면에 알아서 뿌려주세요.
+
+          // 프론트엔드 상태 업데이트
+          setEvents((prevEvents) => {
+            if (!taskModalData?.id) { 
+              // 새 작업 추가 (백엔드에서 반환된 ID 사용)
+              return [
+                ...prevEvents,
+                {
+                  ...taskData,
+                  id: response.data.task_id, // 백엔드에서 반환된 고유 ID
+                  start: new Date(taskData.start), // 문자열을 Date 객체로 변환
+                  end: new Date(taskData.end), // 문자열을 Date 객체로 변환
+                },
+              ];
+            } else {
+              // 기존 작업 업데이트
+              return prevEvents.map((event) =>
+                event.id === taskModalData?.id
+                  ? {
+                      ...event,
+                      ...taskData,
+                      start: new Date(taskData.start), // 문자열을 Date 객체로 변환
+                      end: new Date(taskData.end), // 문자열을 Date 객체로 변환
+                    }
+                  : event
+              );
+            }
+            
+          });
+
+          alert("작업이 성공적으로 저장되었습니다.");
+        } else {
+          console.error("작업 저장 실패:", response.data.message);
+          alert("작업 저장에 실패했습니다: " + response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("작업 저장 중 오류 발생:", error);
+        alert("작업 저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+      });
+
+    setIsModalOpened(false); // 모달 닫기
+  }, [title, startDate, endDate, currentColor, description, taskModalData, events, HOST, PORT]);
+  // 저장 버튼 클릭 끝
+
+     
 
   // 삭제 버튼 클릭
   const handleDeleteButtonClicked = useCallback(() => {

@@ -28,6 +28,10 @@ export interface TaskProps {
   end: Date;
   color: string;
 }
+
+// 작업 목록 상태
+//export const eventsAtom = atom<TaskProps[]>([]);
+
 export const eventsAtom = atom([
   {
     id: 0,
