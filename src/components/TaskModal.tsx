@@ -6,6 +6,8 @@ import {
   Dialog,
   Typography,
   IconButton,
+  Grid2,
+  Divider,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { color } from "../utils/theme";
@@ -15,6 +17,7 @@ import { eventsAtom, isModalOpenedAtom, taskModalDataAtom } from "../state";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { MAX_DATE, MIN_DATE } from "../utils";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
 const TaskModal = () => {
   const [events, setEvents] = useAtom(eventsAtom); // 이벤트 목록
@@ -95,9 +98,9 @@ const TaskModal = () => {
       maxWidth="sm"
       fullWidth
     >
-      <Box sx={{ padding: 2 }}>
+      <Grid2 container direction="column" spacing={2} m={3}>
         {/* 헤더 */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h6">일정 관리</Typography>
 
           {/* 닫기 버튼 */}
@@ -106,8 +109,13 @@ const TaskModal = () => {
           </IconButton>
         </Box>
 
+        {/* 구분선 */}
+        <Divider sx={{
+          mb: 1,
+        }} />
+
         {/* 날짜 필드 */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             {/* 시작 날짜 */}
             <DatePicker
@@ -150,7 +158,7 @@ const TaskModal = () => {
         />
 
         {/* 색상 선택 */}
-        <Box sx={{ display: "flex", alignItems: "center", mt: 2, mb: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography sx={{ mr: 2 }}>색상:</Typography>
           {Object.values(color).map((col) => (
             <Box
@@ -180,12 +188,28 @@ const TaskModal = () => {
           rows={4}
         />
 
+        {/* 작업 완료 버튼 */}
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<CheckRoundedIcon />}
+          disabled={taskModalData?.id === -1} // 새 작업일 때 비활성화
+          sx={{
+            alignSelf: "flex-end",
+            mb: 2,
+          }}
+          onClick={handleDeleteButtonClicked}
+        >
+          작업 완료
+        </Button>
+
         {/* 버튼 */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           {true && ( //TODO: 수정 모드일 때만 삭제 버튼 표시
             <Button
               variant="outlined"
               color="error"
+              disabled={taskModalData?.id === -1}
               onClick={handleDeleteButtonClicked}
             >
               삭제
@@ -204,7 +228,7 @@ const TaskModal = () => {
             </Button>
           </Box>
         </Box>
-      </Box>
+      </Grid2>
     </Dialog>
   );
 };
