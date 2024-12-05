@@ -171,6 +171,11 @@ const Style = styled.div`
           min-width: 30px;
           text-align: right;
         }
+
+        .highlight {
+          animation: highlight 2s ease-in-out;
+          background-color: yellow !important;
+        }
       }
     }
   }
@@ -336,7 +341,84 @@ const FlexMenu: React.FC = () => {
         <Box className="menu-items">
           <Box className="menu-item">
             <NotificationsIcon className="menu-icon" />
-            <Typography>알림 (0)</Typography>
+            <Typography>
+              알림 (
+              {
+                events.filter(
+                  (event) =>
+                    dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
+                    dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+                ).length
+              }
+              )
+            </Typography>
+          </Box>
+
+          {/* 알림 목록 */}
+          <Box
+            sx={{
+              padding: "10px",
+              backgroundColor: "#fff6f6",
+              borderRadius: "8px",
+            }}
+          >
+            {events
+              .filter(
+                (event) =>
+                  dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
+                  dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+              )
+              .map((event, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: "#ffeaea",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                    cursor: "pointer", // 클릭 가능
+                  }}
+                  onClick={() => {
+                    const targetElement = document.querySelector(
+                      `[data-date="${dayjs(event.start).format("YYYY-MM-DD")}"]`
+                    );
+                    if (targetElement) {
+                      targetElement.scrollIntoView({ behavior: "smooth" }); // 달력 이동
+                      targetElement.classList.add("highlight"); // 하이라이트 효과 추가
+                      setTimeout(
+                        () => targetElement.classList.remove("highlight"),
+                        2000
+                      );
+                    }
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {`${dayjs(event.start).format("YYYY.MM.DD")} ~ ${dayjs(
+                        event.end
+                      ).format("YYYY.MM.DD")}`}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#888" }}>
+                      {event.title} {/* 이벤트 제목 표시 */}
+                    </Typography>
+                  </Box>
+
+                  {/* D-Day 표시 */}
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#444",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    {`D-${dayjs(event.start).diff(dayjs(), "day")}`}
+                  </Typography>
+                </Box>
+              ))}
           </Box>
         </Box>
       )}
