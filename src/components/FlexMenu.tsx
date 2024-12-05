@@ -77,7 +77,7 @@ const Style = styled.div`
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 5px;
 
     .menu-item {
       display: flex;
@@ -112,7 +112,6 @@ const Style = styled.div`
     border-radius: 25px;
     border: 1px solid #ddd;
     padding: 5px 10px;
-    width: 100%;
     margin-bottom: 10px;
 
     .search-icon {
@@ -136,7 +135,6 @@ const Style = styled.div`
     border-radius: 8px;
     max-height: 200px;
     overflow-y: auto;
-    width: 100%;
     padding: 5px;
 
     .result-item {
@@ -178,6 +176,14 @@ const Style = styled.div`
         }
       }
     }
+  }
+
+  .ararm-container {
+    background-color: #fff6f6;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
   }
 `;
 
@@ -302,7 +308,7 @@ const FlexMenu: React.FC = () => {
 
       {/* 검색 바 */}
       {isExpanded && (
-        <Box className="search-bar" sx={{ width: "100%", padding: "16px" }}>
+        <Box className="search-bar" sx={{ width: "100%", padding: "18px" }}>
           <Box className="search-container">
             <SearchIcon className="search-icon" />
             <input
@@ -355,13 +361,7 @@ const FlexMenu: React.FC = () => {
           </Box>
 
           {/* 알림 목록 */}
-          <Box
-            sx={{
-              padding: "10px",
-              backgroundColor: "#fff6f6",
-              borderRadius: "8px",
-            }}
-          >
+          <Box className="ararm-container">
             {events
               .filter(
                 (event) =>
@@ -375,7 +375,8 @@ const FlexMenu: React.FC = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    backgroundColor: "#ffeaea",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #ddd",
                     padding: "10px",
                     borderRadius: "8px",
                     marginBottom: "8px",
@@ -393,16 +394,27 @@ const FlexMenu: React.FC = () => {
                         2000
                       );
                     }
+                    setIsModalOpened(true);
                   }}
                 >
                   <Box>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#1E1E1E",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {event.title} {/* 이벤트 제목 표시 */}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#1E1E1E", fontWeight: "bold" }}
+                    >
                       {`${dayjs(event.start).format("YYYY.MM.DD")} ~ ${dayjs(
                         event.end
                       ).format("YYYY.MM.DD")}`}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#888" }}>
-                      {event.title} {/* 이벤트 제목 표시 */}
                     </Typography>
                   </Box>
 
@@ -411,11 +423,11 @@ const FlexMenu: React.FC = () => {
                     variant="body2"
                     sx={{
                       fontWeight: "bold",
-                      color: "#444",
+                      color: "#FB2A2A",
                       marginLeft: "auto",
                     }}
                   >
-                    {`D-${dayjs(event.start).diff(dayjs(), "day")}`}
+                    {`D - ${dayjs(event.start).diff(dayjs(), "day")}`}
                   </Typography>
                 </Box>
               ))}
