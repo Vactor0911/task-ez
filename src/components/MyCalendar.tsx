@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import {
   eventsAtom,
-  hiddenEventsAtom,
   isModalOpenedAtom,
   isShowMoreOpenedAtom,
   selectedDateAtom,
@@ -21,7 +20,7 @@ import { localizer } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
 
 const StyledCalendar = styled(Calendar)`
-  width: 95%;
+  width: calc(100% - 60px);
   height: 100vh;
 
   .rbc-day-bg:hover {
@@ -46,7 +45,6 @@ const MyCalendar = () => {
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
 
   // 더보기 버튼 클릭시 표시할 숨겨진 이벤트 목록
-  const hiddenEvents = useAtomValue(hiddenEventsAtom);
   const [isShowMoreOpened, setIsShowMoreOpened] = useAtom(isShowMoreOpenedAtom);
   const [isShowMoreOpenedDelayed, setIsShowMoreOpenedDelayed] = useState(false);
   const showMoreBtnAnchor = useAtomValue(showMoreBtnAnchorAtom);
@@ -82,7 +80,7 @@ const MyCalendar = () => {
   }, [refCollapse, showMoreBtnAnchor]);
 
   // 이벤트 상태
-  const [events, setEvents] = useAtom(eventsAtom);
+  const events = useAtomValue(eventsAtom);
 
   // 모달 상태 및 선택된 데이터
   const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
@@ -95,13 +93,12 @@ const MyCalendar = () => {
   const handleSelectSlot = useCallback(
     (slotInfo: any) => {
       // 더보기 팝업이 열려있으면 이벤트 처리 중지
-      console.log("Selected Slot! ", isShowMoreOpenedDelayed);
       if (isShowMoreOpenedDelayed) {
         return;
       }
 
       setTaskModalData({
-        id: events.length, // 고유 ID 생성
+        id: -1, // 새로운 이벤트 임시 ID
         title: "", // 초기화된 제목
         description: "", // 초기화된 설명
         color: color.red, // 기본 색상 설정
@@ -114,21 +111,23 @@ const MyCalendar = () => {
   );
 
   // 기존 이벤트 클릭 이벤트 (이벤트 수정)
-  const handleSelectEvent = useCallback((event: any, hidden: boolean = false) => {
-    // 더보기 팝업이 열려있으면 이벤트 처리 중지
-    if (isShowMoreOpenedDelayed && !hidden) {
-      return;
-    }
+  const handleSelectEvent = useCallback(
+    (event: any, hidden: boolean = false) => {
+      // 더보기 팝업이 열려있으면 이벤트 처리 중지
+      if (isShowMoreOpenedDelayed && !hidden) {
+        return;
+      }
 
-    setTaskModalMode(TaskModalMode.EVENT); // 이벤트 모드로 설정
-    setTaskModalData({
-      ...event, // 기존 이벤트 데이터
-      start: dayjs(event.start), // 시작 날짜
-      end: dayjs(event.end), // 종료 날짜
-    });
-    setIsModalOpened(true); // 모달 열기
-    console.log(event);
-  }, [isShowMoreOpenedDelayed]);
+      setTaskModalMode(TaskModalMode.EVENT); // 이벤트 모드로 설정
+      setTaskModalData({
+        ...event, // 기존 이벤트 데이터
+        start: dayjs(event.start), // 시작 날짜
+        end: dayjs(event.end), // 종료 날짜
+      });
+      setIsModalOpened(true); // 모달 열기
+    },
+    [isShowMoreOpenedDelayed]
+  );
 
   return (
     <>
@@ -162,7 +161,10 @@ const MyCalendar = () => {
       <TaskModal />
 
       {/* 작업 더보기 모달 */}
-      <MyShowMoreModal ref={refCollapse} handleSelectEvent={handleSelectEvent} />
+      <MyShowMoreModal
+        ref={refCollapse}
+        handleSelectEvent={handleSelectEvent}
+      />
     </>
   );
 };

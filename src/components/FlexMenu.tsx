@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import { IconButton, Button, Typography, Box } from "@mui/material";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { isLoginModalOpenAtom, loginStateAtom, serverInfoAtom } from "../state";
+import { useAtomValue, useSetAtom } from "jotai";
+import { ModalOpenState, TaskEzLoginStateAtom, modalOpenStateAtom, serverInfoAtom } from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -122,9 +122,9 @@ const Style = styled.div`
 
 const FlexMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
-  const { isLoggedIn, id } = useAtomValue(loginStateAtom); // 로그인 상태 읽기
-  const setLoginState = useSetAtom(loginStateAtom); // useSetAtom 불러오기
+  const setModalOpenState = useSetAtom(modalOpenStateAtom);
+  const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
+  const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
 
   const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
   const HOST = serverInfo.HOST; // HOST 불러오기
@@ -172,10 +172,10 @@ const FlexMenu: React.FC = () => {
           console.log("로그아웃 응답:", response.data);
   
           // LocalStorage에서 로그인 상태 제거
-          localStorage.removeItem("loginState");
+          localStorage.removeItem("TaskEzloginState");
   
           // Jotai 상태 초기화
-          setLoginState({
+          setTaskEzLoginState({
             isLoggedIn: false,
             id: "",
           });
@@ -208,7 +208,7 @@ const FlexMenu: React.FC = () => {
               // 로그아웃 기능 추가
               <LoginButton onClick={handleLogoutClick} />
             ) : (
-              <Button variant="contained" onClick={() => setIsLoginModalOpen(true)} // 로그인 모달 열기
+              <Button variant="contained" onClick={() => setModalOpenState(ModalOpenState.LOGIN)} // 로그인 모달 열기
               >
                 로그인/회원가입
               </Button>

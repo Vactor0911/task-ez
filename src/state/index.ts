@@ -79,17 +79,18 @@ export const eventsAtom = atom([
   },
 ] as TaskProps[]);
 
-// 로그인 모달 상태
-export const isLoginModalOpenAtom = atom(false);
-
-// 회원가입 모달 상태
-export const isRegisterModalOpenAtom = atom(false);
-
+// 모달 상태
+export enum ModalOpenState {
+  NONE,
+  LOGIN,
+  REGISTER,
+}
+export const modalOpenStateAtom = atom(ModalOpenState.NONE);
 
 // 로그인 상태 저장 - LocalStorage에서 상태를 불러옵니다.
-const savedLoginState = JSON.parse(localStorage.getItem("loginState") || "{}");
+const savedLoginState = JSON.parse(localStorage.getItem("TaskEzloginState") || "{}");
 
-export const loginStateAtom = atom({
+export const TaskEzLoginStateAtom = atom({
   isLoggedIn: savedLoginState.isLoggedIn || false, // 로그인 상태
   id: savedLoginState.id || "", // 로그인된 사용자의 아이디
 });
