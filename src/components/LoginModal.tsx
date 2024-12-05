@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   Box,
@@ -13,15 +13,18 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAtom, useSetAtom, useAtomValue } from "jotai";
-import { isLoginModalOpenAtom, isRegisterModalOpenAtom } from "../state";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { serverInfoAtom, TaskEzLoginStateAtom } from "../state";  // serverInfoAtom, TaskEzLoginStateAtom 불러오기
+import {
+  ModalOpenState,
+  modalOpenStateAtom,
+  serverInfoAtom,
+  TaskEzLoginStateAtom,
+} from "../state"; // serverInfoAtom, TaskEzLoginStateAtom 불러오기
 import axios from "axios";
 
 const LoginModal = () => {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
-  const [, setIsRegisterModalOpen] = useAtom(isRegisterModalOpenAtom);
+  const [modalOpenState, setModalOpenState] = useAtom(modalOpenStateAtom); // 모달 열림 상태
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false); // 패스워드 보이기 여부
 
@@ -35,19 +38,17 @@ const LoginModal = () => {
   const HOST = serverInfo.HOST; // HOST 불러오기
   const PORT = serverInfo.PORT; // PORT 불러오기
 
-  // 모달 닫기 및 초기화
-  const handleClose = () => {
-    setIsLoginModalOpen(false);
-    setId("");
-    setPassword("");
-    setErrorMessage(""); // 오류 메시지 초기화
-  };
-
-  // 회원가입 버튼 클릭
-  const handleRegisterClick = () => {
-    handleClose();
-    setIsRegisterModalOpen(true);
-  };
+  // 모달창 변경시 입력값 초기화
+  useEffect(() => {
+    if (
+      modalOpenState === ModalOpenState.LOGIN ||
+      modalOpenState === ModalOpenState.NONE
+    ) {
+      setId("");
+      setPassword("");
+      setErrorMessage("");
+    }
+  }, [modalOpenState]);
 
   //일반 로그인 기능 시작
   const handleLogin = (e: React.FormEvent) => {
@@ -70,8 +71,7 @@ const LoginModal = () => {
       .then((response) => {
         const { nickname } = response.data;
 
-        // 로그인 성공 메시지
-        alert(`[ ${nickname} ]님 로그인에 성공했습니다!`);
+        alert(`[ ${nickname} ]님 로그인에 성공했습니다!`); // 로그인 성공 메시지
 
         // 로그인 상태 업데이트
         const TaskEzloginState = {
@@ -79,14 +79,12 @@ const LoginModal = () => {
           id: id,
         };
 
-        // Jotai 상태 업데이트
-        setLoginState(TaskEzloginState);
-
-        // LocalStorage에 저장
-        localStorage.setItem("TaskEzloginState", JSON.stringify(TaskEzloginState));
-
-        // 성공 후 로그인 모달 닫기
-        handleClose(); // 모달 닫기
+        setLoginState(TaskEzloginState); // Jotai 상태 업데이트
+        localStorage.setItem(
+          "TaskEzloginState",
+          JSON.stringify(TaskEzloginState)
+        ); // LocalStorage에 저장
+        setModalOpenState(ModalOpenState.NONE); // 성공 후 로그인 모달 닫기
       })
       .catch((error) => {
         if (error.response) {
@@ -97,8 +95,7 @@ const LoginModal = () => {
           alert("예기치 않은 오류가 발생했습니다. 나중에 다시 시도해 주세요.");
         }
 
-        // 로그인 실패 시 비밀번호 초기화
-        setPassword("");
+        setPassword(""); // 로그인 실패 시 비밀번호 초기화
       })
       .finally(() => {
         setIsLoading(false); // 로딩 상태 비활성화
@@ -107,15 +104,12 @@ const LoginModal = () => {
 
   return (
     <Dialog
-      open={isLoginModalOpen}
-      onClose={handleClose}
+      open={modalOpenState === ModalOpenState.LOGIN}
+      onClose={() => setModalOpenState(ModalOpenState.NONE)}
       maxWidth="xs"
       fullWidth
-      BackdropProps={{
-        style: {
-          backdropFilter: "blur(3.5px)", // 가우시안 블러 효과
-          backgroundColor: "rgba(0, 0, 0, 0.3)", // 약간의 어두운 투명도 추가
-        },
+      sx={{
+        backdropFilter: "blur(3.5px)", // 가우시안 블러 효과
       }}
     >
       <Box sx={{ padding: 3 }}>
@@ -126,7 +120,7 @@ const LoginModal = () => {
           >
             로그인
           </Typography>
-          <IconButton onClick={handleClose}>
+          <IconButton onClick={() => setModalOpenState(ModalOpenState.NONE)}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -163,9 +157,9 @@ const LoginModal = () => {
                   }}
                 >
                   {isPasswordVisible ? (
-                    <VisibilityIcon sx={{ color: "black" }} />
+                    <VisibilityIcon />
                   ) : (
-                    <VisibilityOffIcon sx={{ color: "black" }} />
+                    <VisibilityOffIcon />
                   )}
                 </IconButton>
               </InputAdornment>
@@ -199,7 +193,7 @@ const LoginModal = () => {
           {/* 회원가입 버튼 */}
           <Button
             variant="text"
-            onClick={handleRegisterClick}
+            onClick={() => setModalOpenState(ModalOpenState.REGISTER)}
             sx={{
               textTransform: "none",
               fontSize: "0.9rem",

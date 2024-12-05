@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import { IconButton, Button, Typography, Box } from "@mui/material";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { isLoginModalOpenAtom, TaskEzLoginStateAtom, serverInfoAtom } from "../state";
+import { useAtomValue, useSetAtom } from "jotai";
+import { ModalOpenState, TaskEzLoginStateAtom, modalOpenStateAtom, serverInfoAtom } from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -122,7 +122,7 @@ const Style = styled.div`
 
 const FlexMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [, setIsLoginModalOpen] = useAtom(isLoginModalOpenAtom);
+  const setModalOpenState = useSetAtom(modalOpenStateAtom);
   const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
   const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
 
@@ -208,7 +208,7 @@ const FlexMenu: React.FC = () => {
               // 로그아웃 기능 추가
               <LoginButton onClick={handleLogoutClick} />
             ) : (
-              <Button variant="contained" onClick={() => setIsLoginModalOpen(true)} // 로그인 모달 열기
+              <Button variant="contained" onClick={() => setModalOpenState(ModalOpenState.LOGIN)} // 로그인 모달 열기
               >
                 로그인/회원가입
               </Button>
