@@ -92,10 +92,12 @@ const TaskModal = () => {
         {/* 날짜 필드 */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {/* 시작 날짜 */}
             <DatePicker
               label="시작 날짜"
               value={startDate}
               format="YYYY-MM-DD"
+              views={['year', 'month', 'day']}
               onChange={(newValue) => {
                 const newStartDate = newValue || dayjs();
                 setStartDate(newStartDate)
@@ -108,10 +110,12 @@ const TaskModal = () => {
               minDate={MIN_DATE}
               maxDate={MAX_DATE}
             />
+            {/* 종료 날짜 */}
             <DatePicker
               label="종료 날짜"
               value={endDate}
               format="YYYY-MM-DD"
+              views={['year', 'month', 'day']}
               onChange={(newValue) => setEndDate(newValue || dayjs())}
               minDate={MIN_DATE.isBefore(startDate) ? startDate : MIN_DATE}
               maxDate={MAX_DATE}
