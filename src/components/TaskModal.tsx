@@ -41,29 +41,46 @@ const TaskModal = () => {
   // 저장 버튼 클릭
   const handleSaveButtonClicked = useCallback(() => {
     if (!taskModalData || !title || !startDate || !endDate) {
+      // 데이터가 없으면 중지
       return;
-    } // 데이터가 없으면 중지
+    }
 
-    setEvents(
-      events.map((event) =>
-        event.id === taskModalData.id
-          ? {
-              ...event,
-              title: title,
-              color: currentColor,
-              description: description,
-              start: startDate.toDate(),
-              end: endDate.add(1, "day").toDate(),
-            }
-          : event
-      )
-    );
+    if (taskModalData.id === -1) {
+      // 새 작업 추가
+      setEvents([
+        ...events,
+        {
+          id: events.length,
+          title: title,
+          color: currentColor,
+          description: description,
+          start: startDate.toDate(),
+          end: endDate.add(1, "day").toDate(),
+        },
+      ]);
+    } else {
+      // 기존 작업 편집
+      setEvents(
+        events.map((event) =>
+          event.id === taskModalData.id
+            ? {
+                ...event,
+                title: title,
+                color: currentColor,
+                description: description,
+                start: startDate.toDate(),
+                end: endDate.add(1, "day").toDate(),
+              }
+            : event
+        )
+      );
+    }
     setIsModalOpened(false);
-  }, [title, currentColor, description, startDate, endDate]);
+  }, [events, title, currentColor, description, startDate, endDate]);
 
   // 삭제 버튼 클릭
   const handleDeleteButtonClicked = useCallback(() => {
-    if (!taskModalData) {
+    if (!taskModalData || taskModalData.id === -1) {
       return;
     } // 데이터가 없으면 중지
 
@@ -97,10 +114,10 @@ const TaskModal = () => {
               label="시작 날짜"
               value={startDate}
               format="YYYY-MM-DD"
-              views={['year', 'month', 'day']}
+              views={["year", "month", "day"]}
               onChange={(newValue) => {
                 const newStartDate = newValue || dayjs();
-                setStartDate(newStartDate)
+                setStartDate(newStartDate);
 
                 // 종료일 이후 선택시 종료일 날짜 변경
                 if (endDate.isBefore(newStartDate)) {
@@ -115,7 +132,7 @@ const TaskModal = () => {
               label="종료 날짜"
               value={endDate}
               format="YYYY-MM-DD"
-              views={['year', 'month', 'day']}
+              views={["year", "month", "day"]}
               onChange={(newValue) => setEndDate(newValue || dayjs())}
               minDate={MIN_DATE.isBefore(startDate) ? startDate : MIN_DATE}
               maxDate={MAX_DATE}
