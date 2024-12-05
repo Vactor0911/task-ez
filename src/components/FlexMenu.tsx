@@ -2,14 +2,24 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import { IconButton, Button, Typography, Box } from "@mui/material";
-import { useAtomValue, useSetAtom } from "jotai";
-import { ModalOpenState, TaskEzLoginStateAtom, modalOpenStateAtom, serverInfoAtom } from "../state";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  isModalOpenedAtom,
+  taskModalDataAtom,
+  eventsAtom,
+  ModalOpenState,
+  TaskEzLoginStateAtom,
+  modalOpenStateAtom,
+  serverInfoAtom,
+} from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 
-import LoginButton from "../components/LoginButton";  // LoginButton 컴포넌트 추가
+import LoginButton from "../components/LoginButton"; // LoginButton 컴포넌트 추가
+import TaskModal from "./TaskModal";
+import { TaskProps } from "../state";
 import axios from "axios";
-
+import dayjs from "dayjs";
 
 const Style = styled.div`
   display: flex;
@@ -54,7 +64,7 @@ const Style = styled.div`
       button {
         font-size: 12px;
         color: #555;
-        background-color: #E5E5E5;
+        background-color: #e5e5e5;
         border-radius: 6px;
         padding: 5px 10px;
         font-weight: bold;
@@ -103,6 +113,7 @@ const Style = styled.div`
     border: 1px solid #ddd;
     padding: 5px 10px;
     width: 100%;
+    margin-bottom: 10px;
 
     .search-icon {
       color: #888;
@@ -118,6 +129,51 @@ const Style = styled.div`
       background: none;
     }
   }
+
+  .search-results {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    padding: 5px;
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      font-size: 14px;
+      cursor: pointer; /* 클릭 가능한 스타일 추가 */
+      &:hover {
+        background-color: #f0f0f0; /* 마우스 오버 효과 */
+      }
+
+      .event-title {
+        font-weight: bold;
+      }
+
+      .event-d-day {
+        display: flex;
+        align-items: center;
+
+        .d-label {
+          font-size: 14px;
+          font-weight: bold;
+          color: #888;
+          min-width: 20px;
+          text-align: center;
+        }
+
+        .d-value {
+          font-size: 14px;
+          color: #555;
+          min-width: 30px;
+          text-align: right;
+        }
+      }
+    }
+  }
 `;
 
 const FlexMenu: React.FC = () => {
@@ -125,12 +181,35 @@ const FlexMenu: React.FC = () => {
   const setModalOpenState = useSetAtom(modalOpenStateAtom);
   const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
   const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<TaskProps[]>([]);
+  const events = useAtomValue(eventsAtom);
+
+  const [, setIsModalOpened] = useAtom(isModalOpenedAtom); // 모달 열림 상태
+  const [, setTaskModalData] = useAtom(taskModalDataAtom); // 선택된 작업 데이터
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const results = events.filter((event) =>
+      event.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setSearchResults(results);
+  }, [searchQuery, events]);
+
+  // 검색 결과 클릭 시 모달 열기
+  const handleResultClick = (event: TaskProps) => {
+    setTaskModalData(event); // 선택된 작업 데이터 설정
+    setIsModalOpened(true); // 모달 열기
+  };
 
   const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
   const HOST = serverInfo.HOST; // HOST 불러오기
   const PORT = serverInfo.PORT; // PORT 불러오기
-
-
 
   // 화면 로딩 상태 관리
   const [isLoaded, setIsLoaded] = useState(false);
@@ -155,31 +234,29 @@ const FlexMenu: React.FC = () => {
     return null;
   }
 
-
-
   // 로그아웃 기능 구현 시작
   const handleLogoutClick = () => {
     if (!isLoggedIn) {
       alert("로그인이 필요합니다."); // 로그인 상태가 아닌 경우 알림
       return;
     }
-  
+
     // Axios를 사용해 로그아웃 요청
     axios
       .post(`${HOST}:${PORT}/api/logout`, { id }) // 사용자 ID 전달
       .then((response) => {
         if (response.data.success) {
           console.log("로그아웃 응답:", response.data);
-  
+
           // LocalStorage에서 로그인 상태 제거
           localStorage.removeItem("TaskEzloginState");
-  
+
           // Jotai 상태 초기화
           setTaskEzLoginState({
             isLoggedIn: false,
             id: "",
           });
-  
+
           alert("로그아웃이 성공적으로 완료되었습니다."); // 성공 메시지
         } else {
           alert(response.data.message || "로그아웃 처리에 실패했습니다."); // 서버에서 실패 메시지
@@ -190,8 +267,7 @@ const FlexMenu: React.FC = () => {
         console.error("로그아웃 중 오류 발생:", error);
         alert("로그아웃 중 오류가 발생했습니다. 다시 시도해 주세요.");
       });
-  };    // 로그아웃 기능 구현 끝
-  
+  }; // 로그아웃 기능 구현 끝
 
   return (
     <Style className={isExpanded ? "expanded" : "collapsed"}>
@@ -208,7 +284,9 @@ const FlexMenu: React.FC = () => {
               // 로그아웃 기능 추가
               <LoginButton onClick={handleLogoutClick} />
             ) : (
-              <Button variant="contained" onClick={() => setModalOpenState(ModalOpenState.LOGIN)} // 로그인 모달 열기
+              <Button
+                variant="contained"
+                onClick={() => setModalOpenState(ModalOpenState.LOGIN)} // 로그인 모달 열기
               >
                 로그인/회원가입
               </Button>
@@ -226,8 +304,30 @@ const FlexMenu: React.FC = () => {
               type="text"
               className="search-input"
               placeholder="할 일 검색"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </Box>
+
+          {searchResults.length > 0 && (
+            <Box className="search-results">
+              {searchResults.map((event) => (
+                <Box
+                  key={event.id}
+                  className="result-item"
+                  onClick={() => handleResultClick(event)} // 클릭 이벤트 추가
+                >
+                  <span className="event-title">{event.title}</span>
+                  <div className="event-d-day">
+                    <span className="d-label">D</span>
+                    <span className="d-value">
+                      {dayjs(event.start).diff(dayjs(), "day")}
+                    </span>
+                  </div>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
       )}
 
@@ -256,6 +356,7 @@ const FlexMenu: React.FC = () => {
           />
         </IconButton>
       </div>
+      <TaskModal />
     </Style>
   );
 };
