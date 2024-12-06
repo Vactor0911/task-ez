@@ -352,8 +352,8 @@ const FlexMenu: React.FC = () => {
               {
                 events.filter(
                   (event) =>
-                    dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
-                    dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+                    dayjs(event.start).diff(dayjs(), "day") >= 0 && // 오늘 이후 포함
+                    dayjs(event.start).diff(dayjs(), "day") <= 3 // 3일 이후까지 포함
                 ).length
               }
               )
@@ -365,8 +365,8 @@ const FlexMenu: React.FC = () => {
             {events
               .filter(
                 (event) =>
-                  dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
-                  dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+                  dayjs(event.start).diff(dayjs(), "day") >= 0 && // 오늘 이후 포함
+                  dayjs(event.start).diff(dayjs(), "day") <= 3 // 3일 이후까지 포함
               )
               .map((event, index) => (
                 <Box
@@ -394,7 +394,7 @@ const FlexMenu: React.FC = () => {
                         2000
                       );
                     }
-                    setIsModalOpened(true);
+                    handleResultClick(event);
                   }}
                 >
                   <Box>
