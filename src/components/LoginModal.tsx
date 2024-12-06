@@ -18,10 +18,10 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
   ModalOpenState,
   modalOpenStateAtom,
-  serverInfoAtom,
   TaskEzLoginStateAtom,
 } from "../state"; // serverInfoAtom, TaskEzLoginStateAtom 불러오기
 import axios from "axios";
+import { SERVER_HOST } from "../utils";
 
 const LoginModal = () => {
   const [modalOpenState, setModalOpenState] = useAtom(modalOpenStateAtom); // 모달 열림 상태
@@ -34,9 +34,6 @@ const LoginModal = () => {
 
   const setLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
   const [, setIsLoading] = useState(false); // 로그인 로딩 상태 추가
-  const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
-  const HOST = serverInfo.HOST; // HOST 불러오기
-  const PORT = serverInfo.PORT; // PORT 불러오기
 
   // 모달창 변경시 입력값 초기화
   useEffect(() => {
@@ -64,7 +61,7 @@ const LoginModal = () => {
 
     // 서버에 로그인 요청
     axios
-      .post(`${HOST}:${PORT}/api/login`, {
+      .post(`${SERVER_HOST}/api/login`, {
         id: id,
         password: password,
       })

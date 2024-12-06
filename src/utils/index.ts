@@ -2,6 +2,9 @@ import dayjs from "dayjs";
 import moment from "moment";
 import { momentLocalizer } from "react-big-calendar";
 
+//서버 정보
+export const SERVER_HOST = "http://task-ez.vactor0911.dev";
+
 // 한국어 설정
 moment.locale("ko-KR");
 export const localizer = momentLocalizer(moment);

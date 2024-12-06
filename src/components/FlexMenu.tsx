@@ -10,7 +10,6 @@ import {
   ModalOpenState,
   TaskEzLoginStateAtom,
   modalOpenStateAtom,
-  serverInfoAtom,
 } from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
@@ -20,6 +19,7 @@ import TaskModal from "./TaskModal";
 import { TaskProps } from "../state";
 import axios from "axios";
 import dayjs from "dayjs";
+import { SERVER_HOST } from "../utils";
 
 const Style = styled.div`
   display: flex;
@@ -218,10 +218,6 @@ const FlexMenu: React.FC = () => {
     setIsModalOpened(true); // 모달 열기
   };
 
-  const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
-  const HOST = serverInfo.HOST; // HOST 불러오기
-  const PORT = serverInfo.PORT; // PORT 불러오기
-
   // 화면 로딩 상태 관리
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -254,7 +250,7 @@ const FlexMenu: React.FC = () => {
 
     // Axios를 사용해 로그아웃 요청
     axios
-      .post(`${HOST}:${PORT}/api/logout`, { id }) // 사용자 ID 전달
+      .post(`${SERVER_HOST}/api/logout`, { id }) // 사용자 ID 전달
       .then((response) => {
         if (response.data.success) {
           console.log("로그아웃 응답:", response.data);

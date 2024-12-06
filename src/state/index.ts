@@ -2,12 +2,6 @@ import dayjs from "dayjs";
 import { atom } from "jotai";
 import { color } from "../utils/theme";
 
-//서버 정보
-export const serverInfoAtom = atom({
-  PORT:3005,
-  HOST:"http://localhost"
-});
-
 export const selectedDateAtom = atom(dayjs());
 
 // 더보기 팝업 관련 상태
