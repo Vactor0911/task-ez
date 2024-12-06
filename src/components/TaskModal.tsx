@@ -76,9 +76,9 @@ const TaskModal = () => {
       .post(`${HOST}:${PORT}/api/saveTask`, taskData)
       .then((response) => {
         if (response.data.success) {
-          console.log("작업 저장 성공:", response.data);
-
-
+          // 백엔드 응답 데이터 로그
+          console.log("작업 저장 성공! 백엔드에서 반환된 데이터:", response.data);
+          
           // TODO 프론트에서 화면에 알아서 뿌려주세요.
 
           // 프론트엔드 상태 업데이트
@@ -111,6 +111,7 @@ const TaskModal = () => {
           });
 
           alert("작업이 성공적으로 저장되었습니다.");
+
         } else {
           console.error("작업 저장 실패:", response.data.message);
           alert("작업 저장에 실패했습니다: " + response.data.message);
