@@ -13,10 +13,15 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { color } from "../utils/theme";
 import dayjs from "dayjs";
 import { useAtom, useAtomValue } from "jotai";
-import { eventsAtom, isModalOpenedAtom, taskModalDataAtom } from "../state"; // serverInfoAtom - API 통신을 위한 서버 정보
+import {
+  eventsAtom,
+  isModalOpenedAtom,
+  TaskEzLoginStateAtom,
+  taskModalDataAtom,
+} from "../state"; // serverInfoAtom - API 통신을 위한 서버 정보
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MAX_DATE, MIN_DATE, SERVER_HOST } from "../utils";
+import { MAX_DATE, MIN_DATE, SERVER_HOST, toKstISOString } from "../utils";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
 import axios from "axios"; // Axios 추가 : 백엔드 통신을 위한 라이브러리 - API 통신을 위한 서버 정보
@@ -25,6 +30,7 @@ const TaskModal = () => {
   const [events, setEvents] = useAtom(eventsAtom); // 이벤트 목록
   const taskModalData = useAtomValue(taskModalDataAtom); // 작업 데이터
   const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 모달 열림 여부
+  const TaskEzLoginState = useAtomValue(TaskEzLoginStateAtom); // 사용자 로그인 상태 정보
 
   const [title, setTitle] = useState(""); // 제목
   const [currentColor, setCurrentColor] = useState(""); // 색상
@@ -39,11 +45,11 @@ const TaskModal = () => {
       setCurrentColor(taskModalData.color);
       setDescription(taskModalData.description);
       setStartDate(dayjs(taskModalData.start));
-      setEndDate(dayjs(taskModalData.end).add(-1, "day"));
+      setEndDate(dayjs(taskModalData.end));
     }
   }, [taskModalData]);
 
-  // 저장 버튼 클릭 시작
+  // 저장 버튼 클릭
   const handleSaveButtonClicked = useCallback(() => {
     if (!title || !startDate || !endDate) {
       // 필수 데이터가 없으면 중지
@@ -54,26 +60,18 @@ const TaskModal = () => {
     // 백엔드 API로 보낼 작업 데이터 구성
     const taskData = {
       id: taskModalData?.id ?? null, // 고유 ID (새 작업의 경우 null로 전송)
-      user_id: 2, // 사용자 ID (임시값)
+      user_id: TaskEzLoginState.userId, // 사용자 ID (임시값)
       title,
       description: description || "",
-      start: startDate.toISOString(),
-      end: endDate.add(1, "day").toISOString(),
+      start: toKstISOString(startDate),
+      end: toKstISOString(endDate),
       color: currentColor || "#3174ad",
     };
 
     axios
-      .post(`${SERVER_HOST}/api/saveTask`, taskData)
+      .post(`${SERVER_HOST}/api/save-task`, taskData)
       .then((response) => {
         if (response.data.success) {
-          // 백엔드 응답 데이터 로그
-          console.log(
-            "작업 저장 성공! 백엔드에서 반환된 데이터:",
-            response.data
-          );
-
-          // TODO 프론트에서 화면에 알아서 뿌려주세요.
-
           // 프론트엔드 상태 업데이트
           setEvents((prevEvents) => {
             if (!taskModalData?.id) {
@@ -81,10 +79,12 @@ const TaskModal = () => {
               return [
                 ...prevEvents,
                 {
-                  ...taskData,
                   id: response.data.task_id, // 백엔드에서 반환된 고유 ID
+                  title: title,
+                  description: description,
                   start: new Date(taskData.start), // 문자열을 Date 객체로 변환
                   end: new Date(taskData.end), // 문자열을 Date 객체로 변환
+                  color: currentColor,
                 },
               ];
             } else {
@@ -101,8 +101,6 @@ const TaskModal = () => {
               );
             }
           });
-
-          alert("작업이 성공적으로 저장되었습니다.");
         } else {
           console.error("작업 저장 실패:", response.data.message);
           alert("작업 저장에 실패했습니다: " + response.data.message);
@@ -127,12 +125,26 @@ const TaskModal = () => {
 
   // 삭제 버튼 클릭
   const handleDeleteButtonClicked = useCallback(() => {
-    if (!taskModalData || taskModalData.id === -1) {
+    if (!taskModalData || taskModalData?.id === null) {
       return;
     } // 데이터가 없으면 중지
 
-    setEvents(events.filter((event) => event.id !== taskModalData.id));
-    setIsModalOpened(false);
+    // 백엔드 API로 보낼 작업 데이터 구성
+    const taskData = {
+      taskId: taskModalData.id,
+    };
+
+    // 백엔드 API로 삭제 요청
+    axios.post(`${SERVER_HOST}/api/delete-task`, taskData).then((response) => {
+      if (response.data.success) {
+        // 프론트엔드 상태 업데이트
+        setEvents(events.filter((event) => event.id !== taskModalData.id));
+        setIsModalOpened(false);
+      } else {
+        console.error("작업 삭제 실패:", response.data.message);
+        alert("작업 삭제에 실패했습니다: " + response.data.message);
+      }
+    });
   }, [taskModalData]);
 
   return (
@@ -239,7 +251,7 @@ const TaskModal = () => {
           variant="contained"
           color="success"
           startIcon={<CheckRoundedIcon />}
-          disabled={taskModalData?.id === -1} // 새 작업일 때 비활성화
+          disabled={taskModalData?.id === null} // 새 작업일 때 비활성화
           sx={{
             alignSelf: "flex-end",
             mb: 2,
@@ -255,7 +267,7 @@ const TaskModal = () => {
             <Button
               variant="outlined"
               color="error"
-              disabled={taskModalData?.id === -1}
+              disabled={taskModalData?.id === null}
               onClick={handleDeleteButtonClicked}
             >
               삭제
