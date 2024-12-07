@@ -10,7 +10,6 @@ import {
   ModalOpenState,
   TaskEzLoginStateAtom,
   modalOpenStateAtom,
-  serverInfoAtom,
 } from "../state";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
@@ -20,6 +19,7 @@ import TaskModal from "./TaskModal";
 import { TaskProps } from "../state";
 import axios from "axios";
 import dayjs from "dayjs";
+import { SERVER_HOST } from "../utils";
 
 const Style = styled.div`
   display: flex;
@@ -190,7 +190,7 @@ const Style = styled.div`
 const FlexMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const setModalOpenState = useSetAtom(modalOpenStateAtom);
-  const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
+  const { isLoggedIn, userId } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
   const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<TaskProps[]>([]);
@@ -217,10 +217,6 @@ const FlexMenu: React.FC = () => {
     setTaskModalData(event); // 선택된 작업 데이터 설정
     setIsModalOpened(true); // 모달 열기
   };
-
-  const serverInfo = useAtomValue(serverInfoAtom); // useAtomValue 불러오기
-  const HOST = serverInfo.HOST; // HOST 불러오기
-  const PORT = serverInfo.PORT; // PORT 불러오기
 
   // 화면 로딩 상태 관리
   const [isLoaded, setIsLoaded] = useState(false);
@@ -254,18 +250,16 @@ const FlexMenu: React.FC = () => {
 
     // Axios를 사용해 로그아웃 요청
     axios
-      .post(`${HOST}:${PORT}/api/logout`, { id }) // 사용자 ID 전달
+      .post(`${SERVER_HOST}/api/logout`, { userId }) // 사용자 ID 전달
       .then((response) => {
         if (response.data.success) {
-          console.log("로그아웃 응답:", response.data);
-
           // LocalStorage에서 로그인 상태 제거
           localStorage.removeItem("TaskEzloginState");
 
           // Jotai 상태 초기화
           setTaskEzLoginState({
             isLoggedIn: false,
-            id: "",
+            userId: null,
           });
 
           alert("로그아웃이 성공적으로 완료되었습니다."); // 성공 메시지
@@ -352,8 +346,8 @@ const FlexMenu: React.FC = () => {
               {
                 events.filter(
                   (event) =>
-                    dayjs(event.start).diff(dayjs(), "day") >= 0 && // 오늘 이후 포함
-                    dayjs(event.start).diff(dayjs(), "day") <= 3 // 3일 이후까지 포함
+                    dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
+                    dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
                 ).length
               }
               )
@@ -365,8 +359,8 @@ const FlexMenu: React.FC = () => {
             {events
               .filter(
                 (event) =>
-                  dayjs(event.start).diff(dayjs(), "day") >= 0 && // 오늘 이후 포함
-                  dayjs(event.start).diff(dayjs(), "day") <= 3 // 3일 이후까지 포함
+                  dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
+                  dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
               )
               .map((event, index) => (
                 <Box
@@ -427,7 +421,7 @@ const FlexMenu: React.FC = () => {
                       marginLeft: "auto",
                     }}
                   >
-                    {`D - ${dayjs(event.start).diff(dayjs(), "day")}`}
+                    {`D - ${dayjs(event.end).diff(dayjs(), "day") + 1}`}
                   </Typography>
                 </Box>
               ))}

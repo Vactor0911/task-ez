@@ -19,7 +19,7 @@ const MyShowMoreModal = forwardRef<HTMLDivElement, MyShowMoreModalProps>(
 
     return (
       <Popper
-        open={true}
+        open={Boolean(showMoreBtnAnchor)}
         placement="bottom-start"
         anchorEl={showMoreBtnAnchor}
         sx={{
