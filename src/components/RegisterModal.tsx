@@ -100,7 +100,6 @@ const RegisterModal = () => {
         })
         .then((response) => {
           alert("회원가입에 성공했습니다.");
-          console.log(response)
           setModalOpenState(ModalOpenState.LOGIN);
         })
         .catch((error) => {
