@@ -346,8 +346,8 @@ const FlexMenu: React.FC = () => {
               {
                 events.filter(
                   (event) =>
-                    dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
-                    dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+                    dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
+                    dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
                 ).length
               }
               )
@@ -359,8 +359,8 @@ const FlexMenu: React.FC = () => {
             {events
               .filter(
                 (event) =>
-                  dayjs(event.start).diff(dayjs(), "day") >= -3 && // 3일 전부터
-                  dayjs(event.start).diff(dayjs(), "day") <= 0 // 오늘까지
+                  dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
+                  dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
               )
               .map((event, index) => (
                 <Box
@@ -421,7 +421,7 @@ const FlexMenu: React.FC = () => {
                       marginLeft: "auto",
                     }}
                   >
-                    {`D - ${dayjs(event.start).diff(dayjs(), "day")}`}
+                    {`D - ${dayjs(event.end).diff(dayjs(), "day") + 1}`}
                   </Typography>
                 </Box>
               ))}
