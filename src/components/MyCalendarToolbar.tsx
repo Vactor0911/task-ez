@@ -85,9 +85,9 @@ const MyCalendarToolbar = () => {
             {selectedDate.format("YYYY년 MM월")}
           </Button>
           <Popper
-            open={true}
+            open={Boolean(anchorElem.current)}
             placement="bottom"
-            anchorEl={anchorElem?.current}
+            anchorEl={anchorElem.current}
             sx={{
               zIndex: 10,
             }}

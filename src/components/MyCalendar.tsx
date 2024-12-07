@@ -11,13 +11,16 @@ import {
   isShowMoreOpenedAtom,
   selectedDateAtom,
   showMoreBtnAnchorAtom,
+  TaskEzLoginStateAtom,
   taskModalDataAtom,
+  TaskProps,
 } from "../state";
 import { color } from "../utils/theme";
 import TaskModal from "./TaskModal";
 import MyShowMore from "./MyShowMore";
-import { localizer } from "../utils";
+import { localizer, SERVER_HOST } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
+import axios from "axios";
 
 const StyledCalendar = styled(Calendar)`
   width: calc(100% - 60px);
@@ -80,7 +83,43 @@ const MyCalendar = () => {
   }, [refCollapse, showMoreBtnAnchor]);
 
   // 이벤트 상태
-  const events = useAtomValue(eventsAtom);
+  const [events, setEvents] = useAtom(eventsAtom);
+
+  const TaskEzLoginState = useAtomValue(TaskEzLoginStateAtom);
+  useEffect(() => {
+    // 새로고침 시 이벤트 목록 다시 불러오기
+    setEvents([] as TaskProps[]); // 이벤트 초기화
+
+    // 로그인 상태가 아니라면 처리 중지
+    if (TaskEzLoginState.userId == null) {
+      return;
+    }
+
+    // 서버에서 이벤트 목록 불러오기
+    axios
+      .post(`${SERVER_HOST}/api/get-tasks`, {
+        userId: TaskEzLoginState.userId,
+      })
+      .then((response) => {
+        const { success, tasks } = response.data;
+        if (success) {
+          // 이벤트 목록 업데이트
+          setEvents(
+            tasks.map((task: any) => ({
+              id: task.task_id,
+              title: task.title,
+              description: task.description,
+              start: new Date(task.start_date),
+              end: new Date(task.end_date),
+              color: task.color,
+            }))
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("이벤트 목록 불러오기 실패:", error);
+      });
+  }, [TaskEzLoginState]);
 
   // 모달 상태 및 선택된 데이터
   const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
@@ -97,13 +136,15 @@ const MyCalendar = () => {
         return;
       }
 
+      console.log("빈 슬롯 클릭:", slotInfo);
+
       setTaskModalData({
-        id: -1, // 새로운 이벤트 임시 ID
+        id: null, // 새로운 이벤트의 경우 ID는 null
         title: "", // 초기화된 제목
         description: "", // 초기화된 설명
         color: color.red, // 기본 색상 설정
         start: dayjs(slotInfo.start).toDate(), // 시작 날짜 설정
-        end: dayjs(slotInfo.end).toDate(), // 종료 날짜 설정
+        end: dayjs(slotInfo.end).add(-1, "day").toDate(), // 종료 날짜 설정
       });
       setIsModalOpened(true); // 모달 열기
     },
@@ -118,11 +159,13 @@ const MyCalendar = () => {
         return;
       }
 
+      console.log("이벤트 클릭:", event);
+
       setTaskModalMode(TaskModalMode.EVENT); // 이벤트 모드로 설정
       setTaskModalData({
         ...event, // 기존 이벤트 데이터
-        start: dayjs(event.start), // 시작 날짜
-        end: dayjs(event.end), // 종료 날짜
+        start: dayjs(event.start).toDate(), // 시작 날짜
+        end: dayjs(event.end).toDate(), // 종료 날짜
       });
       setIsModalOpened(true); // 모달 열기
     },
