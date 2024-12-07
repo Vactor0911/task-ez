@@ -15,7 +15,7 @@ export const taskModalDataAtom = atom(null as TaskProps | null); // 작업 데�
 
 // 작업 객체 타입
 export interface TaskProps {
-  id: number;
+  id: number | null;
   title: string;
   description: string;
   start: Date;
@@ -24,58 +24,7 @@ export interface TaskProps {
 }
 
 // 작업 목록 상태
-//export const eventsAtom = atom<TaskProps[]>([]);
-
-export const eventsAtom = atom([
-  {
-    id: 0,
-    title: "작업1",
-    description: "작업1 설명",
-    start: new Date(2024, 11, 17),
-    end: new Date(2024, 11, 18),
-    color: color.red,
-  },
-  {
-    id: 1,
-    title: "작업2",
-    description: "작업2 설명",
-    start: new Date(2024, 10, 19),
-    end: new Date(2024, 11, 21),
-    color: color.orange,
-  },
-  {
-    id: 2,
-    title: "작업3",
-    description: "작업1 설명",
-    start: new Date(2024, 11, 17),
-    end: new Date(2024, 11, 18),
-    color: color.red,
-  },
-  {
-    id: 3,
-    title: "작업4",
-    description: "작업1 설명",
-    start: new Date(2024, 11, 17),
-    end: new Date(2024, 11, 18),
-    color: color.red,
-  },
-  {
-    id: 4,
-    title: "작업5",
-    description: "작업1 설명",
-    start: new Date(2024, 11, 17),
-    end: new Date(2024, 11, 18),
-    color: color.red,
-  },
-  {
-    id: 5,
-    title: "작업6",
-    description: "작업1 설명",
-    start: new Date(2024, 11, 17),
-    end: new Date(2024, 11, 18),
-    color: color.red,
-  },
-] as TaskProps[]);
+export const eventsAtom = atom<TaskProps[]>([]);
 
 // 모달 상태
 export enum ModalOpenState {
@@ -90,6 +39,5 @@ const savedLoginState = JSON.parse(localStorage.getItem("TaskEzloginState") || "
 
 export const TaskEzLoginStateAtom = atom({
   isLoggedIn: savedLoginState.isLoggedIn || false, // 로그인 상태
-  id: savedLoginState.id || "", // 로그인된 사용자의 아이디
+  userId: savedLoginState.userId || null, // 로그인된 사용자의 아이디
 });
-

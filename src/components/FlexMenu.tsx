@@ -190,7 +190,7 @@ const Style = styled.div`
 const FlexMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const setModalOpenState = useSetAtom(modalOpenStateAtom);
-  const { isLoggedIn, id } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
+  const { isLoggedIn, userId } = useAtomValue(TaskEzLoginStateAtom); // 로그인 상태 읽기
   const setTaskEzLoginState = useSetAtom(TaskEzLoginStateAtom); // useSetAtom 불러오기
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<TaskProps[]>([]);
@@ -250,18 +250,16 @@ const FlexMenu: React.FC = () => {
 
     // Axios를 사용해 로그아웃 요청
     axios
-      .post(`${SERVER_HOST}/api/logout`, { id }) // 사용자 ID 전달
+      .post(`${SERVER_HOST}/api/logout`, { userId }) // 사용자 ID 전달
       .then((response) => {
         if (response.data.success) {
-          console.log("로그아웃 응답:", response.data);
-
           // LocalStorage에서 로그인 상태 제거
           localStorage.removeItem("TaskEzloginState");
 
           // Jotai 상태 초기화
           setTaskEzLoginState({
             isLoggedIn: false,
-            id: "",
+            userId: null,
           });
 
           alert("로그아웃이 성공적으로 완료되었습니다."); // 성공 메시지
