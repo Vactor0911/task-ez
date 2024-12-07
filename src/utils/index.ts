@@ -15,5 +15,5 @@ export const MAX_DATE = dayjs().add(1, "year").month(11).endOf("month"); // 1년
 
 // toISOString() 반환값을 한국 표준시로 변환
 export const toKstISOString = (date: dayjs.Dayjs) => {
-    return new Date(date.toDate().getTime() - date.toDate().getTimezoneOffset() * 60000).toISOString();
+    return new Date(date.toDate().getTime() - date.toDate().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 };
