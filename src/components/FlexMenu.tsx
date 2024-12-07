@@ -388,7 +388,7 @@ const FlexMenu: React.FC = () => {
                         2000
                       );
                     }
-                    setIsModalOpened(true);
+                    handleResultClick(event);
                   }}
                 >
                   <Box>
