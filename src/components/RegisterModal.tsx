@@ -17,6 +17,8 @@ import { grey } from "@mui/material/colors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import { SERVER_HOST } from "../utils";
 
 const RegisterModal = () => {
   const [modalOpenState, setModalOpenState] = useAtom(modalOpenStateAtom);
@@ -80,7 +82,7 @@ const RegisterModal = () => {
         refPasswordConfirm.current?.focus();
         return;
       }
-      
+
       // 별명 검증
       if (!name) {
         alert("별명을 입력해 주세요.");
@@ -90,6 +92,28 @@ const RegisterModal = () => {
 
       // 회원가입 요청
       //TODO: 회원가입 요청
+      axios
+        .post(`${SERVER_HOST}/api/register`, {
+          id,
+          password,
+          name,
+        })
+        .then((response) => {
+          alert("회원가입에 성공했습니다.");
+          console.log(response)
+          setModalOpenState(ModalOpenState.LOGIN);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.error("서버 오류:", error.response.data.message);
+            alert(error.response.data.message || "로그인 실패");
+          } else {
+            console.error("요청 오류:", error.message);
+            alert(
+              "예기치 않은 오류가 발생했습니다. 나중에 다시 시도해 주세요."
+            );
+          }
+        });
     },
     [id, password, passwordConfirm, name]
   );
