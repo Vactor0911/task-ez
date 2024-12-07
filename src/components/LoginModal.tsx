@@ -66,14 +66,14 @@ const LoginModal = () => {
         password: password,
       })
       .then((response) => {
-        const { nickname } = response.data;
+        const { nickname, userId } = response.data;
 
         alert(`[ ${nickname} ]님 로그인에 성공했습니다!`); // 로그인 성공 메시지
 
         // 로그인 상태 업데이트
         const TaskEzloginState = {
           isLoggedIn: true,
-          id: id,
+          userId: userId,
         };
 
         setLoginState(TaskEzloginState); // Jotai 상태 업데이트
