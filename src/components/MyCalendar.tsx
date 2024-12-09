@@ -180,7 +180,7 @@ const MyCalendar = () => {
       });
       setIsModalOpened(true); // 모달 열기
     },
-    [isShowMoreOpenedDelayed]
+    [isShowMoreOpenedDelayed, TaskEzLoginState]
   );
 
   return (
