@@ -5,8 +5,13 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { useEffect, useRef, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { useAtom } from "jotai";
-import { selectedDateAtom } from "../state";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  ModalOpenState,
+  modalOpenStateAtom,
+  selectedDateAtom,
+  TaskEzLoginStateAtom,
+} from "../state";
 
 // 아이콘
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
@@ -46,7 +51,11 @@ const MyCalendarToolbar = () => {
   const refCollapse = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (refCollapse.current && !refCollapse.current.contains(event.target as Node) && event.target !== anchorElem.current) {
+      if (
+        refCollapse.current &&
+        !refCollapse.current.contains(event.target as Node) &&
+        event.target !== anchorElem.current
+      ) {
         setIsDataCalendarOpen(false);
       }
     };
@@ -56,17 +65,29 @@ const MyCalendarToolbar = () => {
     };
   }, [refCollapse]);
 
+  // 로그인 상태
+  const TaskEzLoginState = useAtomValue(TaskEzLoginStateAtom);
+
+  // 로그인 대화상자 상태
+  const setModalOpenState = useSetAtom(modalOpenStateAtom);
+
   return (
     <Style>
       <div className="rbc-toolbar">
         <span className="rbc-btn-group">
           <IconButton
             onClick={() => {
-                if (selectedDate <= MIN_DATE) {
-                  return;
-                }
-                setSelectedDate(selectedDate.add(-1, "month"));
-              }}
+              // 비로그인 상태면 로그인 대화상자 팝업
+              if (!TaskEzLoginState.isLoggedIn) {
+                setModalOpenState(ModalOpenState.LOGIN); // 로그인 대화상자 팝업
+                return;
+              }
+
+              if (selectedDate <= MIN_DATE) {
+                return;
+              }
+              setSelectedDate(selectedDate.add(-1, "month"));
+            }}
           >
             <PlayArrowRoundedIcon sx={{ transform: "rotate(180deg)" }} />
           </IconButton>
@@ -75,11 +96,17 @@ const MyCalendarToolbar = () => {
           <Button
             ref={anchorElem}
             onClick={() => {
+              // 비로그인 상태면 로그인 대화상자 팝업
+              if (!TaskEzLoginState.isLoggedIn) {
+                setModalOpenState(ModalOpenState.LOGIN); // 로그인 대화상자 팝업
+                return;
+              }
+
               setIsDataCalendarOpen(!isDataCalendarOpen);
             }}
             sx={{
-                fontWeight: "bold",
-                fontSize: "1.5em",
+              fontWeight: "bold",
+              fontSize: "1.5em",
             }}
           >
             {selectedDate.format("YYYY년 MM월")}
@@ -126,6 +153,12 @@ const MyCalendarToolbar = () => {
         <span className="rbc-btn-group">
           <IconButton
             onClick={() => {
+              // 비로그인 상태면 로그인 대화상자 팝업
+              if (!TaskEzLoginState.isLoggedIn) {
+                setModalOpenState(ModalOpenState.LOGIN); // 로그인 대화상자 팝업
+                return;
+              }
+
               if (selectedDate >= MAX_DATE.add(-1, "month")) {
                 return;
               }
