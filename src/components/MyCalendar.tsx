@@ -4,11 +4,13 @@ import dayjs from "dayjs";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import MyCalendarToolbar from "./MyCalendarToolbar";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   eventsAtom,
   isModalOpenedAtom,
   isShowMoreOpenedAtom,
+  ModalOpenState,
+  modalOpenStateAtom,
   selectedDateAtom,
   showMoreBtnAnchorAtom,
   TaskEzLoginStateAtom,
@@ -23,7 +25,7 @@ import MyShowMoreModal from "./MyShowMoreModal";
 import axios from "axios";
 
 const StyledCalendar = styled(Calendar)`
-  width: calc(100% - 60px);
+  width: calc(100% - 70px);
   height: 100vh;
 
   .rbc-day-bg:hover {
@@ -108,7 +110,7 @@ const MyCalendar = () => {
             tasks.map((task: any) => ({
               id: task.task_id,
               title: task.title,
-              description: task.description,
+              description: task.content,
               start: new Date(task.start_date),
               end: new Date(task.end_date),
               color: task.color,
@@ -127,16 +129,21 @@ const MyCalendar = () => {
   const [taskModalMode, setTaskModalMode] = useState<TaskModalMode>(
     TaskModalMode.NONE
   ); // 모달 모드
+  const setModalOpenState = useSetAtom(modalOpenStateAtom); // 모달 열림 상태
 
   // 빈 슬롯 클릭 이벤트 (새 이벤트 추가)
   const handleSelectSlot = useCallback(
     (slotInfo: any) => {
+      // 비로그인 상태이면 로그인 대화상자 팝업
+      if (!TaskEzLoginState.isLoggedIn) {
+        setModalOpenState(ModalOpenState.LOGIN); // 로그인 대화상자 팝업
+        return;
+      }
+
       // 더보기 팝업이 열려있으면 이벤트 처리 중지
       if (isShowMoreOpenedDelayed) {
         return;
       }
-
-      console.log("빈 슬롯 클릭:", slotInfo);
 
       setTaskModalData({
         id: null, // 새로운 이벤트의 경우 ID는 null
@@ -148,18 +155,22 @@ const MyCalendar = () => {
       });
       setIsModalOpened(true); // 모달 열기
     },
-    [isShowMoreOpenedDelayed]
+    [isShowMoreOpenedDelayed, TaskEzLoginState]
   );
 
   // 기존 이벤트 클릭 이벤트 (이벤트 수정)
   const handleSelectEvent = useCallback(
     (event: any, hidden: boolean = false) => {
+      // 비로그인 상태이면 로그인 대화상자 팝업
+      if (!TaskEzLoginState.isLoggedIn) {
+        setModalOpenState(ModalOpenState.LOGIN); // 로그인 대화상자 팝업
+        return;
+      }
+
       // 더보기 팝업이 열려있으면 이벤트 처리 중지
       if (isShowMoreOpenedDelayed && !hidden) {
         return;
       }
-
-      console.log("이벤트 클릭:", event);
 
       setTaskModalMode(TaskModalMode.EVENT); // 이벤트 모드로 설정
       setTaskModalData({
@@ -191,6 +202,8 @@ const MyCalendar = () => {
           return {
             style: {
               backgroundColor: event.color,
+              color: "black",
+              fontWeight: "500",
             },
           };
         }}

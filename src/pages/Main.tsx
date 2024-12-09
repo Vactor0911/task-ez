@@ -5,21 +5,21 @@ import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 
 const Style = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
 `;
 
 const Main = () => {
-    return (
-        <Style>
-            <FlexMenu />
-            <MyCalendar />
-            <LoginModal />
-            <RegisterModal />
-        </Style>
-    );
-}
+  return (
+    <Style>
+      <FlexMenu />
+      <MyCalendar />
+      <LoginModal />
+      <RegisterModal />
+    </Style>
+  );
+};
 
 export default Main;

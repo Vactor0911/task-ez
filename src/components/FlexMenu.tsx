@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
-import { IconButton, Button, Typography, Box } from "@mui/material";
+import {
+  IconButton,
+  Button,
+  Typography,
+  Box,
+  Paper,
+  InputBase,
+} from "@mui/material";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   isModalOpenedAtom,
@@ -15,7 +22,6 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 
 import LoginButton from "../components/LoginButton"; // LoginButton 컴포넌트 추가
-import TaskModal from "./TaskModal";
 import { TaskProps } from "../state";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -24,7 +30,6 @@ import { SERVER_HOST } from "../utils";
 const Style = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   position: absolute;
   height: 100vh;
   top: 0;
@@ -33,13 +38,23 @@ const Style = styled.div`
   z-index: 1000;
   transition: width 0.4s;
   overflow: hidden;
+  padding: 10px 10px;
+  padding-right: 60px;
 
   &.expanded {
-    width: 300px;
+    width: 370px;
   }
 
   &.collapsed {
     width: 60px;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 300px;
+    height: 100%;
   }
 
   .header {
@@ -47,7 +62,6 @@ const Style = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 10px 20px;
 
     .logo {
       display: block;
@@ -74,10 +88,10 @@ const Style = styled.div`
 
   .menu-items {
     width: 100%;
-    padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 5px;
+    max-height: 50%;
 
     .menu-item {
       display: flex;
@@ -93,47 +107,30 @@ const Style = styled.div`
     }
   }
 
-  .arrow-container {
+  .btn-expand-wrapper {
     position: absolute;
-    top: 50%;
-    left: 95%;
-    transform: translate(-50%, -50%);
-    transition: left 0.4s;
-  }
-
-  &.collapsed .arrow-container {
-    left: 50%;
-  }
-
-  .search-container {
+    right: 0;
+    top: 0;
+    width: 60px;
+    height: 100%;
     display: flex;
+    justify-content: center;
     align-items: center;
-    background-color: #fff;
-    border-radius: 25px;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    margin-bottom: 10px;
+    background-color: #fff6f6;
+  }
 
-    .search-icon {
-      color: #888;
-      margin-right: 8px;
-    }
-
-    .search-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      color: #555;
-      background: none;
-    }
+  .search-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    max-height: 35%;
   }
 
   .search-results {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    max-height: 200px;
     overflow-y: auto;
     padding: 5px;
 
@@ -181,9 +178,14 @@ const Style = styled.div`
   .ararm-container {
     background-color: #fff6f6;
     border-radius: 8px;
-    max-height: 300px;
     overflow-y: auto;
     padding: 5px;
+  }
+
+  .typo {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
@@ -207,7 +209,9 @@ const FlexMenu: React.FC = () => {
 
     const results = events.filter((event) =>
       event.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ).filter((event) => {
+      return dayjs(event.end) >= dayjs(dayjs().format("YYYY-MM-DD"));
+    });
 
     setSearchResults(results);
   }, [searchQuery, events]);
@@ -276,14 +280,12 @@ const FlexMenu: React.FC = () => {
 
   return (
     <Style className={isExpanded ? "expanded" : "collapsed"}>
-      {/* 헤더 섹션 */}
-      <div className="header">
-        {isExpanded && (
+      <div className="wrapper">
+        {/* 헤더 섹션 */}
+        <div className="header">
           <Typography variant="h6" className="logo">
             Task Ez
           </Typography>
-        )}
-        {isExpanded && (
           <div className="auth-buttons">
             {isLoggedIn ? (
               // 로그아웃 기능 추가
@@ -297,23 +299,33 @@ const FlexMenu: React.FC = () => {
               </Button>
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* 검색 바 */}
-      {isExpanded && (
-        <Box className="search-bar" sx={{ width: "100%", padding: "18px" }}>
-          <Box className="search-container">
-            <SearchIcon className="search-icon" />
-            <input
-              type="text"
-              className="search-input"
+        {/* 작업 검색 */}
+        <div className="search-bar">
+          {/* 검색 바 */}
+          <Paper
+            component="form"
+            elevation={0}
+            sx={{
+              p: "5px 10px",
+              display: "flex",
+              borderRadius: "50px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <InputBase
               placeholder="할 일 검색"
+              sx={{ flex: 1 }}
+              startAdornment={
+                <SearchIcon sx={{ color: "#888", margin: "0 8px" }} />
+              }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </Box>
+          </Paper>
 
+          {/* 검색 결과 */}
           {searchResults.length > 0 && (
             <Box className="search-results">
               {searchResults.map((event) => (
@@ -322,22 +334,47 @@ const FlexMenu: React.FC = () => {
                   className="result-item"
                   onClick={() => handleResultClick(event)} // 클릭 이벤트 추가
                 >
-                  <span className="event-title">{event.title}</span>
+                  <Typography
+                    className="typo"
+                    variant="body2"
+                    sx={{
+                      color: "#1E1E1E",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      width: "75%",
+                    }}
+                  >
+                    {event.title} {/* 이벤트 제목 표시 */}
+                  </Typography>
                   <div className="event-d-day">
-                    <span className="d-label">D</span>
-                    <span className="d-value">
-                      {dayjs(event.start).diff(dayjs(), "day")}
-                    </span>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#FB2A2A",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      {`D - ${
+                        dayjs(event.end).diff(
+                          dayjs(dayjs().format("YYYY.MM.DD")),
+                          "days"
+                        ) <= 0
+                          ? "Day"
+                          : dayjs(event.end).diff(
+                              dayjs(dayjs().format("YYYY.MM.DD")),
+                              "days"
+                            )
+                      }`}
+                    </Typography>
                   </div>
                 </Box>
               ))}
             </Box>
           )}
-        </Box>
-      )}
+        </div>
 
-      {/* 메뉴 아이템 */}
-      {isExpanded && (
+        {/* 메뉴 아이템 */}
         <Box className="menu-items">
           <Box className="menu-item">
             <NotificationsIcon className="menu-icon" />
@@ -359,8 +396,14 @@ const FlexMenu: React.FC = () => {
             {events
               .filter(
                 (event) =>
-                  dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
-                  dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
+                  dayjs(event.end).diff(
+                    dayjs(dayjs().format("YYYY.MM.DD")),
+                    "day"
+                  ) < 3 && // 3일 전부터
+                  dayjs(event.end).diff(
+                    dayjs(dayjs().format("YYYY.MM.DD")),
+                    "day"
+                  ) >= 0 // 오늘까지
               )
               .map((event, index) => (
                 <Box
@@ -391,8 +434,13 @@ const FlexMenu: React.FC = () => {
                     handleResultClick(event);
                   }}
                 >
-                  <Box>
+                  <Box
+                    sx={{
+                      width: "75%",
+                    }}
+                  >
                     <Typography
+                      className="typo"
                       variant="body2"
                       sx={{
                         color: "#1E1E1E",
@@ -403,6 +451,7 @@ const FlexMenu: React.FC = () => {
                       {event.title} {/* 이벤트 제목 표시 */}
                     </Typography>
                     <Typography
+                      className="typo"
                       variant="body2"
                       sx={{ color: "#1E1E1E", fontWeight: "bold" }}
                     >
@@ -421,30 +470,39 @@ const FlexMenu: React.FC = () => {
                       marginLeft: "auto",
                     }}
                   >
-                    {`D - ${dayjs(event.end).diff(dayjs(), "day") + 1}`}
+                    {`D - ${
+                      dayjs(event.end).diff(
+                        dayjs(dayjs().format("YYYY.MM.DD")),
+                        "days"
+                      ) <= 0
+                        ? "Day"
+                        : dayjs(event.end).diff(
+                            dayjs(dayjs().format("YYYY.MM.DD")),
+                            "days"
+                          )
+                    }`}
                   </Typography>
                 </Box>
               ))}
           </Box>
         </Box>
-      )}
+      </div>
 
       {/* 토글 버튼 */}
-      <div className="arrow-container">
+      <Box className="btn-expand-wrapper">
         <IconButton
-          aria-label="toggle-menu"
-          size="small"
+          className="btn-expand"
+          size="medium"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <ArrowForwardIosRoundedIcon
             sx={{
               transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "0.3s",
+              transition: "0.4s",
             }}
           />
         </IconButton>
-      </div>
-      <TaskModal />
+      </Box>
     </Style>
   );
 };
