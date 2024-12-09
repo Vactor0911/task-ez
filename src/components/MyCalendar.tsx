@@ -110,7 +110,7 @@ const MyCalendar = () => {
             tasks.map((task: any) => ({
               id: task.task_id,
               title: task.title,
-              description: task.description,
+              description: task.content,
               start: new Date(task.start_date),
               end: new Date(task.end_date),
               color: task.color,
@@ -202,6 +202,8 @@ const MyCalendar = () => {
           return {
             style: {
               backgroundColor: event.color,
+              color: "black",
+              fontWeight: "500",
             },
           };
         }}

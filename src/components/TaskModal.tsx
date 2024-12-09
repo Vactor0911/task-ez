@@ -41,11 +41,11 @@ const TaskModal = () => {
   // 작업 모달 데이터가 변경되면 상태 업데이트
   useEffect(() => {
     if (taskModalData) {
-      setTitle(taskModalData.title);
-      setCurrentColor(taskModalData.color);
-      setDescription(taskModalData.description);
-      setStartDate(dayjs(taskModalData.start));
-      setEndDate(dayjs(taskModalData.end));
+      setTitle(taskModalData.title ? taskModalData.title : "");
+      setCurrentColor(taskModalData.color ? taskModalData.color : "");
+      setDescription(taskModalData.description ? taskModalData.description : "");
+      setStartDate(dayjs(taskModalData.start ? taskModalData.start : ""));
+      setEndDate(dayjs(taskModalData.end ? taskModalData.end : ""));
     }
   }, [taskModalData]);
 

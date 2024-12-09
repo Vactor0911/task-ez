@@ -209,7 +209,9 @@ const FlexMenu: React.FC = () => {
 
     const results = events.filter((event) =>
       event.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ).filter((event) => {
+      return dayjs(event.end) >= dayjs(dayjs().format("YYYY-MM-DD"));
+    });
 
     setSearchResults(results);
   }, [searchQuery, events]);
