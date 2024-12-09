@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import ReportGmailerrorredRoundedIcon from "@mui/icons-material/ReportGmailerrorredRounded";
-import { Icon } from "@mui/material";
 
 const Style = styled.div`
   display: flex;

@@ -124,9 +124,9 @@ const MyCalendar = () => {
   }, [TaskEzLoginState]);
 
   // 모달 상태 및 선택된 데이터
-  const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
-  const [taskModalData, setTaskModalData] = useAtom(taskModalDataAtom); // 작업 데이터
-  const [taskModalMode, setTaskModalMode] = useState<TaskModalMode>(
+  const setIsModalOpened = useSetAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
+  const setTaskModalData = useSetAtom(taskModalDataAtom); // 작업 데이터
+  const [, setTaskModalMode] = useState<TaskModalMode>(
     TaskModalMode.NONE
   ); // 모달 모드
   const setModalOpenState = useSetAtom(modalOpenStateAtom); // 모달 열림 상태
