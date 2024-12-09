@@ -4,7 +4,7 @@ import Mobile from "./pages/Mobile";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/task-ez/">
       <Routes>
         <Route path="/" element={screen.width < 768 ? <Mobile /> : <Main />} />
         <Route path="*" element={<Navigate to="/" replace />} />
