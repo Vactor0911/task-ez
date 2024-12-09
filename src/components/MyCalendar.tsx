@@ -20,7 +20,7 @@ import {
 import { color } from "../utils/theme";
 import TaskModal from "./TaskModal";
 import MyShowMore from "./MyShowMore";
-import { localizer, SERVER_HOST } from "../utils";
+import { localizer, MAX_DATE, MIN_DATE, SERVER_HOST } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
 import axios from "axios";
 
@@ -124,11 +124,9 @@ const MyCalendar = () => {
   }, [TaskEzLoginState]);
 
   // 모달 상태 및 선택된 데이터
-  const [isModalOpened, setIsModalOpened] = useAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
-  const [taskModalData, setTaskModalData] = useAtom(taskModalDataAtom); // 작업 데이터
-  const [taskModalMode, setTaskModalMode] = useState<TaskModalMode>(
-    TaskModalMode.NONE
-  ); // 모달 모드
+  const setIsModalOpened = useSetAtom(isModalOpenedAtom); // 작업 편집 모달 열림 여부
+  const setTaskModalData = useSetAtom(taskModalDataAtom); // 작업 데이터
+  const [, setTaskModalMode] = useState<TaskModalMode>(TaskModalMode.NONE); // 모달 모드
   const setModalOpenState = useSetAtom(modalOpenStateAtom); // 모달 열림 상태
 
   // 빈 슬롯 클릭 이벤트 (새 이벤트 추가)
@@ -142,6 +140,11 @@ const MyCalendar = () => {
 
       // 더보기 팝업이 열려있으면 이벤트 처리 중지
       if (isShowMoreOpenedDelayed) {
+        return;
+      }
+
+      // 선택한 날짜가 범위 밖에 있다면 이벤트 처리 중지
+      if (dayjs(slotInfo.start) < MIN_DATE || dayjs(slotInfo.end).add(-1, "day") > MAX_DATE) {
         return;
       }
 
@@ -180,7 +183,7 @@ const MyCalendar = () => {
       });
       setIsModalOpened(true); // 모달 열기
     },
-    [isShowMoreOpenedDelayed]
+    [isShowMoreOpenedDelayed, TaskEzLoginState]
   );
 
   return (

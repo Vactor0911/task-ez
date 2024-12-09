@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import { atom } from "jotai";
-import { color } from "../utils/theme";
 
 export const selectedDateAtom = atom(dayjs());
 

@@ -12,7 +12,7 @@ import {
   FormControl,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAtom, useSetAtom, useAtomValue } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
