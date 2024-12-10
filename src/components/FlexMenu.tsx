@@ -25,7 +25,7 @@ import LoginButton from "../components/LoginButton"; // LoginButton 컴포넌트
 import { TaskProps } from "../state";
 import axios from "axios";
 import dayjs from "dayjs";
-import { SERVER_HOST } from "../utils";
+import { koDayjs, SERVER_HOST } from "../utils";
 
 const Style = styled.div`
   display: flex;
@@ -207,11 +207,13 @@ const FlexMenu: React.FC = () => {
       return;
     }
 
-    const results = events.filter((event) =>
-      event.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ).filter((event) => {
-      return dayjs(event.end) >= dayjs(dayjs().format("YYYY-MM-DD"));
-    });
+    const results = events
+      .filter((event) =>
+        event.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .filter((event) => {
+        return dayjs(event.end) >= dayjs(dayjs().format("YYYY-MM-DD"));
+      });
 
     setSearchResults(results);
   }, [searchQuery, events]);
@@ -397,13 +399,10 @@ const FlexMenu: React.FC = () => {
               .filter(
                 (event) =>
                   dayjs(event.end).diff(
-                    dayjs(dayjs().format("YYYY.MM.DD")),
+                    dayjs(koDayjs().format("YYYY-MM-DD")),
                     "day"
                   ) < 3 && // 3일 전부터
-                  dayjs(event.end).diff(
-                    dayjs(dayjs().format("YYYY.MM.DD")),
-                    "day"
-                  ) >= 0 // 오늘까지
+                  dayjs(event.end) >= dayjs(koDayjs().format("YYYY-MM-DD")) // 오늘까지
               )
               .map((event, index) => (
                 <Box
@@ -472,12 +471,12 @@ const FlexMenu: React.FC = () => {
                   >
                     {`D - ${
                       dayjs(event.end).diff(
-                        dayjs(dayjs().format("YYYY.MM.DD")),
+                        koDayjs().format("YYYY-MM-DD"),
                         "days"
                       ) <= 0
                         ? "Day"
                         : dayjs(event.end).diff(
-                            dayjs(dayjs().format("YYYY.MM.DD")),
+                            koDayjs().format("YYYY-MM-DD"),
                             "days"
                           )
                     }`}
