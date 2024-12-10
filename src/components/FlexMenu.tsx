@@ -324,6 +324,11 @@ const FlexMenu: React.FC = () => {
               }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key == "Enter") {
+                  e.preventDefault(); // Enter키 동작 방지
+                }
+              }}
             />
           </Paper>
 
