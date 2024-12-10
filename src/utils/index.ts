@@ -17,3 +17,8 @@ export const MAX_DATE = dayjs().add(1, "year").month(11).endOf("month"); // 1년
 export const toKstISOString = (date: dayjs.Dayjs) => {
     return new Date(date.toDate().getTime() - date.toDate().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 };
+
+// 한국 표준시가 적용된 dayjs 객체 반환
+export const koDayjs = (date?: dayjs.Dayjs) => {
+    return dayjs(dayjs(date).toDate().getTime() - dayjs(date).toDate().getTimezoneOffset() * 60000);
+};
