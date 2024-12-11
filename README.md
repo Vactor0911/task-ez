@@ -66,19 +66,19 @@
         </td>
     </tr>
     <tr>
-        <td>
+        <td style="text-align: center">
             <a href="https://github.com/Vactor0911" target="_blank">Vactor0911</a>
         </td>
-        <td>
+        <td style="text-align: center">
             <a href="https://github.com/JSukhen2" target="_blank">JSukhen2</a>
         </td>
-        <td>
+        <td style="text-align: center">
             <a href="https://github.com/costar011" target="_blank">costar011</a>
         </td>
-        <td>
+        <td style="text-align: center">
             <a href="https://github.com/L-Hits" target="_blank">L-Hits</a>
         </td>
-        <td>
+        <td style="text-align: center">
             <a href="https://github.com/shkim429" target="_blank">shkim429</a>
         </td>
     </tr>
