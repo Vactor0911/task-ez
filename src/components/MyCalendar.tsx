@@ -62,9 +62,12 @@ const MyCalendar = () => {
       return;
     }
 
-    setTimeout(() => {
-      setIsShowMoreOpenedDelayed(isShowMoreOpened);
+    const delay = setTimeout(() => {
+      if (!isShowMoreOpened) {
+        setIsShowMoreOpenedDelayed(isShowMoreOpened);
+      }
     }, 300);
+    return () => clearTimeout(delay);
   }, [isShowMoreOpened]);
 
   // 이벤트 더보기 외부 클릭시 팝업 닫기
