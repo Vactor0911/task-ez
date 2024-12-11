@@ -83,7 +83,7 @@ const MyCalendarToolbar = () => {
                 return;
               }
 
-              if (selectedDate <= MIN_DATE) {
+              if (selectedDate <= MIN_DATE.add(1, "month")) {
                 return;
               }
               setSelectedDate(selectedDate.add(-1, "month"));

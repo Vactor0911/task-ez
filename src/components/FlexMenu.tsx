@@ -335,48 +335,50 @@ const FlexMenu: React.FC = () => {
           {/* 검색 결과 */}
           {searchResults.length > 0 && (
             <Box className="search-results">
-              {searchResults.map((event) => (
-                <Box
-                  key={event.id}
-                  className="result-item"
-                  onClick={() => handleResultClick(event)} // 클릭 이벤트 추가
-                >
-                  <Typography
-                    className="typo"
-                    variant="body2"
-                    sx={{
-                      color: "#1E1E1E",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      width: "75%",
-                    }}
+              {searchResults
+                .sort((a, b) => dayjs(a.end).diff(dayjs(b.end), "day")) // 종료일 기준으로 정렬
+                .map((event) => (
+                  <Box
+                    key={event.id}
+                    className="result-item"
+                    onClick={() => handleResultClick(event)} // 클릭 이벤트 추가
                   >
-                    {event.title} {/* 이벤트 제목 표시 */}
-                  </Typography>
-                  <div className="event-d-day">
                     <Typography
+                      className="typo"
                       variant="body2"
                       sx={{
+                        color: "#1E1E1E",
+                        fontSize: "16px",
                         fontWeight: "bold",
-                        color: "#FB2A2A",
-                        marginLeft: "auto",
+                        width: "75%",
                       }}
                     >
-                      {`D - ${
-                        dayjs(event.end).diff(
-                          dayjs(dayjs().format("YYYY.MM.DD")),
-                          "days"
-                        ) <= 0
-                          ? "Day"
-                          : dayjs(event.end).diff(
-                              dayjs(dayjs().format("YYYY.MM.DD")),
-                              "days"
-                            )
-                      }`}
+                      {event.title} {/* 이벤트 제목 표시 */}
                     </Typography>
-                  </div>
-                </Box>
-              ))}
+                    <div className="event-d-day">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#FB2A2A",
+                          marginLeft: "auto",
+                        }}
+                      >
+                        {`D - ${
+                          dayjs(event.end).diff(
+                            dayjs(dayjs().format("YYYY.MM.DD")),
+                            "days"
+                          ) <= 0
+                            ? "Day"
+                            : dayjs(event.end).diff(
+                                dayjs(dayjs().format("YYYY.MM.DD")),
+                                "days"
+                              )
+                        }`}
+                      </Typography>
+                    </div>
+                  </Box>
+                ))}
             </Box>
           )}
         </div>
@@ -390,8 +392,8 @@ const FlexMenu: React.FC = () => {
               {
                 events.filter(
                   (event) =>
-                    dayjs(event.end).diff(dayjs(), "day") < 3 && // 3일 전부터
-                    dayjs(event.end).diff(dayjs(), "day") >= 0 // 오늘까지
+                    dayjs(event.end).diff(koDayjs(), "day") <= 3 && // 3일 전부터
+                    dayjs(event.end).diff(koDayjs(), "day") >= 0 // 오늘까지
                 ).length
               }
               )
@@ -403,12 +405,10 @@ const FlexMenu: React.FC = () => {
             {events
               .filter(
                 (event) =>
-                  dayjs(event.end).diff(
-                    dayjs(koDayjs().format("YYYY-MM-DD")),
-                    "day"
-                  ) < 3 && // 3일 전부터
-                  dayjs(event.end) >= dayjs(koDayjs().format("YYYY-MM-DD")) // 오늘까지
+                  dayjs(event.end).diff(koDayjs(), "day") <= 3 && // 3일 전부터
+                  dayjs(event.end).diff(koDayjs(), "day") >= 0 // 오늘까지
               )
+              .sort((a, b) => dayjs(a.end).diff(dayjs(b.end), "day")) // 종료일 기준으로 정렬
               .map((event, index) => (
                 <Box
                   key={index}
