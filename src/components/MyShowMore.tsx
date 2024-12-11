@@ -19,16 +19,16 @@ const MyShowMore = ({ events, count }: any) => {
 
       // 화면에 이미 출력중인 이벤트 제목 가져오기
       const showingEvents = document.querySelectorAll(".rbc-event-content");
-      const showingEventNames = [] as string[];
+      const showingEventIds = [] as number[];
       showingEvents.forEach((event) => {
-        if (event.textContent) {
-          showingEventNames.push(event.textContent);
+        if (event.id) {
+          showingEventIds.push(Number(event.id));
         }
       });
 
       // 화면에 안보이는 이벤트 제목 가져오기
       const newHiddenEvents = events.filter(
-        (event: any) => !showingEventNames.includes(event.title)
+        (event: any) => !showingEventIds.includes(event.id)
       );
       setHiddenEvents(newHiddenEvents); // 화면에 안보이는 이벤트 목록 저장
       setIsShowMoreOpened(!isShowMoreOpened); // 더보기 팝업 열기

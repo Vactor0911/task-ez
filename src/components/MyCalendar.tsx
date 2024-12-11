@@ -23,6 +23,7 @@ import MyShowMore from "./MyShowMore";
 import { localizer, MAX_DATE, MIN_DATE, SERVER_HOST } from "../utils";
 import MyShowMoreModal from "./MyShowMoreModal";
 import axios from "axios";
+import MyEvent from "./MyEvent";
 
 const StyledCalendar = styled(Calendar)`
   width: calc(100% - 70px);
@@ -197,6 +198,7 @@ const MyCalendar = () => {
         components={{
           toolbar: MyCalendarToolbar,
           showMore: MyShowMore,
+          event: MyEvent,
         }} // 툴바 컴포넌트
         onSelectSlot={handleSelectSlot} // 빈 슬롯 클릭 이벤트
         onSelectEvent={(event) => handleSelectEvent(event)} // 이벤트 클릭 이벤트

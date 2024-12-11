@@ -45,7 +45,7 @@ const MyShowMoreModal = forwardRef<HTMLDivElement, MyShowMoreModalProps>(
                     backgroundColor: event.color,
                     padding: "5px",
                     borderRadius: "5px",
-                    color: "white",
+                    color: "black",
                     cursor: "pointer",
                     width: "200px",
                     overflow: "hidden",
