@@ -20,5 +20,5 @@ export const toKstISOString = (date: dayjs.Dayjs) => {
 
 // 한국 표준시가 적용된 dayjs 객체 반환
 export const koDayjs = (date?: dayjs.Dayjs) => {
-    return dayjs(dayjs(date).toDate());
+    return dayjs(dayjs(date).format("YYYY-MM-DD")).add(9, "hour");
 };
