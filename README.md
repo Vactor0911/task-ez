@@ -91,32 +91,32 @@
 > 모든 기능은 로그인 후에 사용하실 수 있습니다.
 
 ### 로그인 및 회원가입
-![로그인 예시화면]()  
+![로그인 예시화면](https://github.com/user-attachments/assets/b7df6e31-264e-4617-938a-8bb72f90bf7a)  
 `아이디`, `비밀번호`를 입력하여 로그인을 진행한 후, Task-EZ의 서비스를 이용할 수 있습니다.
 
-![회원가입 예시화면]()  
+![회원가입 예시화면](https://github.com/user-attachments/assets/d0a8c9c4-f277-434e-975d-2522c86be55e)  
 `아이디`, `비밀번호`, `별명`을 입력하여 회원가입을 진행할 수 있습니다.
 
-![로그아웃]()  
+![로그아웃](https://github.com/user-attachments/assets/dc35f6f3-7dc7-42e8-9fbf-8081d4827a6a)  
 메뉴 우측 상단의 프로필 아이콘을 클릭하여 로그아웃을 할 수 있습니다.
 
 </br>
 
 ### 날짜 선택
-![날짜 선택기 예시화면]()  
+![날짜 선택기 예시화면](https://github.com/user-attachments/assets/8dfd9b85-7a38-4a10-9a15-ee6e207b037e)  
 날짜 선택기를 통해 원하는 날짜를 선택하여 표시되는 달력의 시점을 변경할 수 있습니다.
 
 </br>
 
 ### 작업 관리
-![새 일정 추가 예시화면]()  
+![새 일정 추가 예시화면](https://github.com/user-attachments/assets/17e9da16-ce52-4681-94d8-0787f932b2fc)  
 달력에서 특정 기간을 선택하면 일정 편집 대화상자가 나타나고, 일정 정보를 작성할 수 있습니다.  
 날짜를 클릭하거나 드래그하여 기간을 지정할 수 있습니다.  
 
-![일정 편집 예시화면]()  
+![일정 편집 예시화면](https://github.com/user-attachments/assets/15acedfc-acff-4df2-a7c5-0b5755d992f7)  
 편집하려는 일정 라벨을 클릭하면 일정 편집 대화상자가 나타나고, 일정 정보를 수정하거나 삭제할 수 있습니다.
 
-![일정 완료 예시화면]()  
+![일정 완료 예시화면](https://github.com/user-attachments/assets/5aac927c-2ed2-4aa5-b781-7bb55fb90747)  
 등록된 일정들은 라벨 형태로 표시되고, 일정 편집 대화상자에서 작업 완료 버튼을 클릭하면 해당 일정이 삭제됩니다.
 
 > [!IMPORTANT]
@@ -126,11 +126,11 @@
 </br>
 
 ### 검색
-![검색 예시화면]()  
+![검색 예시화면](https://github.com/user-attachments/assets/d4609496-9a1e-47f0-aaf6-ff133a052a5b)  
 메뉴의 검색창에서 `일정 제목`을 검색할 수 있고, 검색 결과에 대한 `D-Day`를 확인할 수 있습니다.
 
 </br>
 
 ### 알림
-![알림 예시화면]()  
+![알림 예시화면](https://github.com/user-attachments/assets/0e186277-0d7a-4c50-a0e2-8972d2be6965)  
 메뉴에서 종료일이 3일 이내로 남은 일정에 대하여 알림을 받을 수 있습니다.
