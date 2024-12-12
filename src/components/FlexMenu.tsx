@@ -286,7 +286,7 @@ const FlexMenu: React.FC = () => {
         {/* 헤더 섹션 */}
         <div className="header">
           <Typography variant="h6" className="logo">
-            Task Ez
+            Task EZ
           </Typography>
           <div className="auth-buttons">
             {isLoggedIn ? (
