@@ -3,6 +3,11 @@
 ### 업무나 일정을 간단하게 등록해 할 일을 효율적으로 관리할 수 있는 `TODO Calender` 
 **Task EZ 바로가기** 👉 https://vactor0911.github.io/task-ez/
 
+> [!WARNING]
+> 2024.12.21 부로 서버 호스팅이 종료되어 서비스를 이용하실 수 없습니다.
+<br />
+<br />
+
 </br>
 
 ## 📖 Description
